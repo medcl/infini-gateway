@@ -1,0 +1,11 @@
+{
+	"ImportPath": "github.com/jbowles/nlpt-detect",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v58",
+	"Deps": [
+		{
+			"ImportPath": "github.com/jbowles/nlpt-cld2",
+			"Rev": "1b1a19478ef56e280cccd221d2160edb8711aa4d"
+		}
+	]
+}

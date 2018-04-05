@@ -1,0 +1,60 @@
+path.data: data
+path.logs: log
+path.certs: test/cert
+
+tls_enabled: false
+
+cookie_secret: PROXY-SECRET
+
+logging.level: debug
+
+#http_bind: 0.0.0.0:9001
+api_bind: 0.0.0.0:2900
+
+modules:
+
+- name: api
+  enabled: true
+
+- name: web
+  enabled: false
+  auth:
+    enabled: false
+    oauth_provider: github
+    oauth_authorize_url: https://github.com/login/oauth/authorize
+    oauth_token_url: https://github.com/login/oauth/access_token
+    client_id: 850d747174ace88ce889
+    client_secret: 3d437b64e06371d6f62769320438d3dfc95a8d8e
+    authorized_admin:
+      - medcl
+      - your_github_login_name
+
+- name: queue
+  enabled: true
+
+- name: persist
+  enabled: true
+  driver: sqlite
+
+plugins:
+- name: proxy
+  enabled: true
+  algorithm: duplicate
+  disk_queue: true
+  upstream:
+  - name: primary
+    enabled: true
+    timeout: 60s
+    elasticsearch:
+      endpoint: http://localhost:9200
+      index_prefix: gopa-
+      username: elastic
+      password: changeme
+  - name: backup
+    enabled: false
+    timeout: 60s
+    elasticsearch:
+     endpoint: http://localhost:9201
+     index_prefix: gopa-
+     username: elastic
+     password: changeme

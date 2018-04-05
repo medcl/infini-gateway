@@ -1,0 +1,26 @@
+ignore:
+  # Ignore coverage for generated code.
+  - "protocol/**/command([0-9]*)?.go"
+  - "protocol/**/domain([0-9]*)?.go"
+  - "protocol/**/types([0-9]*)?.go"
+  - "protocol/**/event([0-9]*)?.go"
+  - "protocol/page18.go"
+  - "protocol/internal/page19.go"
+
+coverage:
+  range: 70..100
+  round: nearest
+  precision: 1
+
+  status:
+    project:
+      default:
+        enabled: yes
+        threshold: 2%
+    patch: no
+    changes: no
+
+comment:
+  layout: "header, diff"
+  behavior: once
+  require_changes: yes

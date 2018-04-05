@@ -1,0 +1,17 @@
+<%! func LoginFail(w http.ResponseWriter) error %>
+<%% import "github.com/infinitbyte/gopa/modules/ui/common" %%>
+<%% import "net/http" %%>
+
+<% common.Head(w, "Login Failed","") %>
+<% common.Body(w) %>
+<div class="tm-middle">
+    <div class="uk-container uk-container-center">
+        <br/>
+        <div class="uk-grid">
+            <div class="uk-align-center"><br>
+                <div class="uk-alert uk-alert-danger">Login failed.</div>
+            </div>
+        </div>
+    </div>
+</div>
+<% common.Footer(w) %>

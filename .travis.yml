@@ -1,0 +1,40 @@
+language: go
+os:
+- osx
+- linux
+
+before_install:
+  - GO_FILES=$(find . -iname '*.go' | grep -v /vendor/)  # All the .go files, excluding vendor/
+  - PKGS=$(go list ./... | grep -v /vendor/)             # All the import paths, excluding vendor/
+  - go get github.com/mattn/goveralls
+  - go get github.com/golang/lint/golint
+  - go get honnef.co/go/tools/cmd/megacheck
+  - go get github.com/infinitbyte/framework
+
+script:
+  - make clean config build
+#  - travis_wait 30 $HOME/gopath/bin/goveralls -service=travis-ci
+  - test -z $(gofmt -s -l $GO_FILES)  # Fail if a .go file hasn't been formatted with gofmt
+#  - go test -v $PKGS                   # Run all the tests
+#  - go test -v -race $PKGS            # Run all the tests with the race detector enabled
+#  - go vet $PKGS                      # go vet is the official Go static analyzer
+#  - megacheck $PKGS                   # "go vet on steroids" + linter
+#  - golint -set_exit_status $PKGS     # one last linter
+
+go:
+- 1.8
+- 1.9
+- master
+
+deploy:
+  provider: releases
+  api_key:
+    secure: K9EcQOtPXGMH4EJm0P4Fc3cL+xq3A6mEU5RY+IPHLktzzTg8gUHIDb+rPbwQYQcPA3g6Xtr83TtlaBEhhgz0/Kqdl43BmYo5SqA3DeVCL71P9E4B29mf6kdbB4V/E+eDiUK/k3zkWWV0Oj3gPA9pZoyMSk2iRNuX8atgyo3tUIk4Z8m6o50zAFHwZping0TaQSF5YELRWBPTio/I6Qu41KzoIqIicB5Wsd7nMH+PKDDtMGCgp7M4LoN83mdFmJk8QVYQvyDWG6KzTtxi5GGPY1mg9LZuc6FOp1ZOpevLJ2yTEJXk48pTLWsykdFDsZiVzv6sQNe0JVgkcy+doKojANUNXvDChRfQdpVjSjO8kYrKESMW4+U+QMhGhJ3cFMYA+PQWzxCfKJl78msaOqSExDEwcSP5R96WYul7Vebpi9NSp3h8Gw7YN96pkgXerUlzcyoBkOAtLQn8VW3Y0MEZvEsQr1wKuCh55k3YtGRIeulsf8L7EAxk21wrcWQuS/MP7A+Mnsa1hHvqyt3bAMp5CIrfZJ0smOVSoIw9SVvbTFG1ewIb23x/5rnm+Pd0d3YXtoTzJK4uDD3vXIQzidIcWnMS/VkPtQthNTj0mC+BISIrG2xEE1/P1BhuZDUUVR6G2lfC8BWRDTCi0DkOjJEhT8Pa9ZvsF/3uYMHaWxLMdIk=
+  file: bin/*.tar.gz
+  file_glob: true
+  on:
+    repo: medcl/elasticsearch-proxy
+    tags: true
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

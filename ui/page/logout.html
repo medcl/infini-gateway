@@ -1,0 +1,24 @@
+<%! func Logout(w http.ResponseWriter,url string) error %>
+<%% import "github.com/infinitbyte/gopa/modules/ui/common" %%>
+<%% import "github.com/infinitbyte/gopa/core/util" %%>
+<%% import "net/http" %%>
+
+<% common.Head(w, "Logout Success","") %>
+
+<META HTTP-EQUIV="refresh" CONTENT="5;URL=<%= url %>">
+
+<% common.Body(w) %>
+<div class="tm-middle">
+    <div class="uk-container uk-container-center">
+        <br/>
+        <div class="uk-grid">
+            <div class="uk-align-center"><br>
+                <div>Redirecting to: <%= url %></div>
+
+                <div class="uk-alert uk-alert-success">
+                    <a href="<%= util.UrlDecode(url) %>" class="uk-icon-hover uk-icon-medium"> Logout success, click to continue.</a></div>
+            </div>
+        </div>
+    </div>
+</div>
+<% common.Footer(w) %>
