@@ -47,15 +47,6 @@ func main() {
 		//modules
 		module.New()
 
-		//load core modules first
-		//module.Register(module.Database, persist.DatabaseModule{})
-		//module.Register(module.Storage, storage.StorageModule{})
-		//module.Register(module.Filter, filter.FilterModule{})
-		//module.Register(module.Stats, stats.SimpleStatsModule{})
-		//module.Register(module.Queue, queue.DiskQueue{})
-		//module.Register(module.Index, index.IndexModule{})
-		//module.Register(module.System, pipeline.PipelineFrameworkModule{})
-		//module.Register(module.System, cluster.ClusterModule{})
 		module.Register(module.API, api.APIModule{})
 		module.Register(module.UI, ui.UIModule{})
 

@@ -3,7 +3,7 @@ PROXY, a simple elasticsearch proxy written in Go.
 
 # Features
 - Enable auto handling elasticsearch failure, via disk based indexing queue(WIP)
-- Enable Opt-in TLS/HTTPS protect
+- Enable opt-in TLS/HTTPS protect
 - Enable replicate indexing request to multi remote elasticsearch clusters(WIP)
 - Enable load balancing(indexing and search request), algorithm configurable(WIP)
 
