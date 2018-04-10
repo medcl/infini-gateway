@@ -1,0 +1,76 @@
+{"type":"log","args":[{"type":"string","value":"foo"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","className":"String","description":"String"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"number","value":42,"description":"42"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","className":"Number","description":"Number"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"number","unserializableValue":"Infinity","description":"Infinity"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"number","unserializableValue":"-Infinity","description":"-Infinity"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"number","unserializableValue":"NaN","description":"NaN"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","className":"Number","description":"Number"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"boolean","value":true}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","className":"Boolean","description":"Boolean"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"undefined"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"null","value":null}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","className":"Object","description":"Object"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","className":"Object","description":"Object"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","className":"Object","description":"Object"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","className":"Object","description":"Object"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"array","className":"Array","description":"Array(0)"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"array","className":"Array","description":"Array(4)"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"number","value":1257894000000,"description":"1257894000000"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"date","className":"Date","description":"Wed Nov 11 2009 01:00:00 GMT+0200 (EET)"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"regexp","className":"RegExp","description":"/\\/.*\\//g"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"regexp","className":"RegExp","description":"/\\/$^\\//"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"symbol","description":"Symbol(=))"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"symbol","description":"Symbol(=()"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"map","className":"Map","description":"Map(1)"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"map","className":"Map","description":"Map(0)"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"map","className":"Map","description":"Map(1)"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"weakmap","className":"WeakMap","description":"WeakMap"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"set","className":"Set","description":"Set(3)"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"set","className":"Set","description":"Set(0)"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"set","className":"Set","description":"Set(3)"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"weakset","className":"WeakSet","description":"WeakSet"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"promise","className":"Promise","description":"Promise"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"promise","className":"Promise","description":"Promise"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"typedarray","className":"Uint8Array","description":"Uint8Array(2)"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"typedarray","className":"Int8Array","description":"Int8Array(0)"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"function","className":"Function","description":"function () {}"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"function","className":"Function","description":"() =\u003e {}"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"string","value":"foo"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","className":"String","description":"String","preview":{"type":"object","description":"String","overflow":false,"properties":[{"name":"0","type":"string","value":"b"},{"name":"1","type":"string","value":"a"},{"name":"2","type":"string","value":"r"},{"name":"length","type":"number","value":"3"},{"name":"[[PrimitiveValue]]","type":"string","value":"bar"}]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"number","value":42,"description":"42"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","className":"Number","description":"Number","preview":{"type":"object","description":"Number","overflow":false,"properties":[{"name":"[[PrimitiveValue]]","type":"number","value":"9001"}]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"number","unserializableValue":"Infinity","description":"Infinity"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"number","unserializableValue":"-Infinity","description":"-Infinity"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"number","unserializableValue":"NaN","description":"NaN"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","className":"Number","description":"Number","preview":{"type":"object","description":"Number","overflow":false,"properties":[{"name":"[[PrimitiveValue]]","type":"number","value":"NaN"}]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"boolean","value":true}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","className":"Boolean","description":"Boolean","preview":{"type":"object","description":"Boolean","overflow":false,"properties":[{"name":"[[PrimitiveValue]]","type":"boolean","value":"false"}]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"undefined"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"null","value":null}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","className":"Object","description":"Object","preview":{"type":"object","description":"Object","overflow":false,"properties":[]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","className":"Object","description":"Object","preview":{"type":"object","description":"Object","overflow":false,"properties":[{"name":":^)","type":"string","value":"^_^"},{"name":"ping","type":"string","value":"pong"},{"name":"t","type":"number","value":"-10"}]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","className":"Object","description":"Object","preview":{"type":"object","description":"Object","overflow":false,"properties":[{"name":"a","type":"number","value":"1"}]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","className":"Object","description":"Object","preview":{"type":"object","description":"Object","overflow":true,"properties":[{"name":"a","type":"boolean","value":"true"},{"name":"b","type":"boolean","value":"false"},{"name":"c","type":"object","value":"Object"},{"name":"d","type":"object","value":"Array(0)","subtype":"array"},{"name":"e","type":"object","value":"Wed Nov 11 2009 01:00:00 GMT+0200 (EET)","subtype":"date"}]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"array","className":"Array","description":"Array(0)","preview":{"type":"object","subtype":"array","description":"Array(0)","overflow":false,"properties":[]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"array","className":"Array","description":"Array(4)","preview":{"type":"object","subtype":"array","description":"Array(4)","overflow":false,"properties":[{"name":"0","type":"number","value":"1"},{"name":"1","type":"number","value":"2.333"},{"name":"2","type":"number","value":"666"},{"name":"3","type":"object","value":"Object"}]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"number","value":1257894000000,"description":"1257894000000"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"date","className":"Date","description":"Wed Nov 11 2009 01:00:00 GMT+0200 (EET)","preview":{"type":"object","subtype":"date","description":"Wed Nov 11 2009 01:00:00 GMT+0200 (EET)","overflow":false,"properties":[]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"regexp","className":"RegExp","description":"/\\/.*\\//g","preview":{"type":"object","subtype":"regexp","description":"/\\/.*\\//g","overflow":false,"properties":[{"name":"lastIndex","type":"number","value":"0"}]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"regexp","className":"RegExp","description":"/\\/$^\\//","preview":{"type":"object","subtype":"regexp","description":"/\\/$^\\//","overflow":false,"properties":[{"name":"lastIndex","type":"number","value":"0"}]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"symbol","description":"Symbol(=))"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"symbol","description":"Symbol(=()"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"map","className":"Map","description":"Map(1)","preview":{"type":"object","subtype":"map","description":"Map(1)","overflow":false,"properties":[],"entries":[{"key":{"type":"boolean","description":"true","overflow":false,"properties":[]},"value":{"type":"boolean","description":"false","overflow":false,"properties":[]}}]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"map","className":"Map","description":"Map(0)","preview":{"type":"object","subtype":"map","description":"Map(0)","overflow":false,"properties":[]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"map","className":"Map","description":"Map(1)","preview":{"type":"object","subtype":"map","description":"Map(1)","overflow":false,"properties":[],"entries":[{"key":{"type":"number","description":"1337","overflow":false,"properties":[]},"value":{"type":"string","description":"hello","overflow":false,"properties":[]}}]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"weakmap","className":"WeakMap","description":"WeakMap","preview":{"type":"object","subtype":"weakmap","description":"WeakMap","overflow":false,"properties":[]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"set","className":"Set","description":"Set(3)","preview":{"type":"object","subtype":"set","description":"Set(3)","overflow":false,"properties":[],"entries":[{"value":{"type":"boolean","description":"true","overflow":false,"properties":[]}},{"value":{"type":"boolean","description":"false","overflow":false,"properties":[]}},{"value":{"type":"object","subtype":"null","description":"null","overflow":false,"properties":[]}}]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"set","className":"Set","description":"Set(0)","preview":{"type":"object","subtype":"set","description":"Set(0)","overflow":false,"properties":[]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"set","className":"Set","description":"Set(3)","preview":{"type":"object","subtype":"set","description":"Set(3)","overflow":false,"properties":[],"entries":[{"value":{"type":"number","description":"1","overflow":false,"properties":[]}},{"value":{"type":"number","description":"2","overflow":false,"properties":[]}},{"value":{"type":"number","description":"3","overflow":false,"properties":[]}}]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"weakset","className":"WeakSet","description":"WeakSet","preview":{"type":"object","subtype":"weakset","description":"WeakSet","overflow":false,"properties":[]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"promise","className":"Promise","description":"Promise","preview":{"type":"object","subtype":"promise","description":"Promise","overflow":false,"properties":[{"name":"[[PromiseStatus]]","type":"string","value":"pending"},{"name":"[[PromiseValue]]","type":"undefined","value":"undefined"}]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"promise","className":"Promise","description":"Promise","preview":{"type":"object","subtype":"promise","description":"Promise","overflow":false,"properties":[{"name":"[[PromiseStatus]]","type":"string","value":"resolved"},{"name":"[[PromiseValue]]","type":"string","value":"'ello"}]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"typedarray","className":"Uint8Array","description":"Uint8Array(2)","preview":{"type":"object","subtype":"typedarray","description":"Uint8Array(2)","overflow":false,"properties":[{"name":"0","type":"number","value":"1"},{"name":"1","type":"number","value":"0"}]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"object","subtype":"typedarray","className":"Int8Array","description":"Int8Array(0)","preview":{"type":"object","subtype":"typedarray","description":"Int8Array(0)","overflow":false,"properties":[]}}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"function","className":"Function","description":"function () {}"}],"executionContextId":0,"timestamp":null}
+{"type":"log","args":[{"type":"function","className":"Function","description":"() =\u003e {}"}],"executionContextId":0,"timestamp":null}

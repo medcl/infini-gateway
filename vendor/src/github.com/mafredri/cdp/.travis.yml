@@ -1,0 +1,25 @@
+language: go
+
+sudo: false
+
+addons:
+  chrome: stable
+
+go:
+  - 1.8.x
+  - tip
+
+before_install:
+  # Use --disable-setuid-sandbox to avoid core dump on Travis.
+  - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 --disable-setuid-sandbox about:blank &
+
+script:
+  - go test -browser
+  - go list -f '{{if len .TestGoFiles}}-coverprofile={{.Name}}_coverage.out {{.ImportPath}}{{end}}' ./... | xargs -L1 go test -race -covermode=atomic
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+  - killall google-chrome-stable
+
+matrix:
+  fast_finish: true

@@ -1,0 +1,70 @@
+path.data: data
+path.logs: log
+
+api_bind: 0.0.0.0:2900
+
+modules:
+- name: api
+  enabled: true
+
+plugins:
+- name: proxy
+  enabled: true
+  upstream:
+  - name: primary
+    enabled: true
+    queue_name: primary
+    max_queue_depth: -1
+    timeout: 60s
+    elasticsearch:
+      endpoint: http://localhost:9200
+      username: elastic
+      password: changeme
+  - name: backup
+    enabled: true
+    queue_name: backup
+    max_queue_depth: -1
+    timeout: 60s
+    elasticsearch:
+     endpoint: http://localhost:9201
+     username: elastic
+     password: changeme
+
+modules:
+- name: pipeline
+  enabled: true
+  runners:
+    - name: primary
+      enabled: true
+      input_queue: primary
+      max_go_routine: 3
+      threshold_in_ms: 0
+      timeout_in_ms: 5000
+      default_config:
+        start:
+          joint: index
+          enabled: true
+        process: []
+        end:
+          joint: logging
+          enabled: true
+        error:
+          joint: on_error
+          enabled: true
+    - name: backup
+      enabled: true
+      input_queue: backup
+      max_go_routine: 1
+      threshold_in_ms: 0
+      timeout_in_ms: 5000
+      default_config:
+        start:
+          joint: index
+          enabled: true
+        process: []
+        end:
+          joint: logging
+          enabled: true
+        error:
+          joint: on_error
+          enabled: true

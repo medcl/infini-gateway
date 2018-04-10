@@ -1,0 +1,5 @@
+package ui
+
+func InitUI() {
+
+}
