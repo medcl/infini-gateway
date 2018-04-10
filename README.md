@@ -5,11 +5,11 @@ PROXY, a lightweight elasticsearch proxy written in golang.
 - Auto handling upstream failure while indexing, aka nonstop indexing
 - Auto detect the upstream failure in search
 - Multiple write mechanism, one indexing request map to multi remote elasticsearch clusters
-- Support run background as daemon mode(only available linux and macOS)
+- Support run background as daemon mode(only available on linux and macOS)
 - Auto merge indexing operations to single bulk operation(WIP)
 - Load balancing(indexing and search request), algorithm configurable(WIP)
 - A controllable query cache layer(WIP)
-- Index throttling or buffering, via disk based indexing queue((limit by queue length or size)
+- Index throttling or buffering, via disk based indexing queue(limit by queue length or size)
 - Search throttling, limit concurrent connections to upstream(WIP)
 - Builtin stats API and management UI(WIP)
 
@@ -141,6 +141,24 @@ Have fun!
     * Connection #0 to host localhost left intact
     {"_index":"index","_type":"doc","_id":"1","_version":5,"found":true,"_source":{"a":6}}%
     ```
+
+# UI
+
+http://localhost:9001/admin/
+
+# API
+
+- Status
+```
+curl -XGET localhost:2900/_proxy/stats
+```
+```
+curl -XGET localhost:2900/_proxy/queue/stats
+```
+- Resume Queue
+```
+curl -XPOST http://localhost:2900/_proxy/queue/resume -d'{"queue":"primary"}'
+```
 
 License
 =======
