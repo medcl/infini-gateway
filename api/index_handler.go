@@ -11,6 +11,7 @@ import (
 	"github.com/infinitbyte/framework/core/queue"
 	"github.com/infinitbyte/framework/core/util"
 	"github.com/medcl/elasticsearch-proxy/config"
+	"github.com/medcl/elasticsearch-proxy/model"
 	"net/http"
 	"strings"
 	"time"
@@ -26,10 +27,12 @@ func (handler *API) IndexAction(w http.ResponseWriter, req *http.Request, _ http
 		cfg := config.GetUpstreamConfig(upstream)
 		if cfg.Enabled && cfg.Active {
 
-			response, err := handler.executeHttpRequest(cfg.Elasticsearch, req, nil)
+			response, err := handler.executeHttpRequest(cfg.Elasticsearch, req.URL.String(), req.Method, nil)
 			if err != nil {
+				log.Error(err)
+
 				handler.WriteJSON(w, util.MapStr{
-					"error": err,
+					"error": err.Error(),
 				}, 500)
 				return
 			}
@@ -69,10 +72,10 @@ func (handler *API) IndexAction(w http.ResponseWriter, req *http.Request, _ http
 	handler.WriteJSON(w, &data, http.StatusOK)
 }
 
-func (handler *API) executeHttpRequest(cfg index.ElasticsearchConfig, req *http.Request, body []byte) (*util.Result, error) {
-	url := fmt.Sprintf("%s%s", cfg.Endpoint, req.URL)
+func (handler *API) executeHttpRequest(cfg index.ElasticsearchConfig, url, method string, body []byte) (*util.Result, error) {
+	url = fmt.Sprintf("%s%s", cfg.Endpoint, url)
 	request := util.NewPostRequest(url, body)
-	request.Method = req.Method
+	request.Method = method
 	request.SetBasicAuth(cfg.Username, cfg.Password)
 	return util.ExecuteRequest(request)
 }
@@ -85,10 +88,20 @@ func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []
 		cfg := config.GetUpstreamConfig(upstream)
 		if cfg.Enabled && cfg.Active {
 
-			response, err := handler.executeHttpRequest(cfg.Elasticsearch, req, body)
+			response, err := handler.executeHttpRequest(cfg.Elasticsearch, req.URL.String(), req.Method, body)
 			if err != nil {
+				log.Error(err)
+
+				request := model.Request{}
+				request.Url = req.URL.String()
+				request.Upstream = cfg.Name
+				request.Method = req.Method
+				request.Body = string(body)
+				request.Message = err.Error()
+				model.CreateRequest(&request)
+
 				handler.WriteJSON(w, util.MapStr{
-					"error": err,
+					"error": err.Error(),
 				}, 500)
 				return
 			}
@@ -109,10 +122,18 @@ func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []
 		if v.Enabled && v.Active {
 
 			cfg := v.Elasticsearch
-			response, err := handler.executeHttpRequest(cfg, req, body)
+			response, err := handler.executeHttpRequest(cfg, req.URL.String(), req.Method, body)
 
 			if err != nil {
 				log.Error(err)
+				request := model.Request{}
+				request.Url = req.URL.String()
+				request.Upstream = v.Name
+				request.Method = req.Method
+				request.Body = string(body)
+				request.Message = err.Error()
+				model.CreateRequest(&request)
+
 				continue
 			}
 
@@ -165,10 +186,15 @@ func (handler *API) handleWrite(w http.ResponseWriter, req *http.Request, body [
 		}
 	}
 
+	code := 200
+	if !ack {
+		code = 500
+	}
+
 	handler.WriteJSON(w, util.MapStr{
 		"acknowledge": ack,
 		"_upstream":   response,
-	}, 200)
+	}, code)
 }
 
 var noUpstreamMsg = "no upstream available"
@@ -177,8 +203,9 @@ func (handler *API) ProxyAction(w http.ResponseWriter, req *http.Request) {
 
 	body, err := handler.GetRawBody(req)
 	if err != nil {
+		log.Error(err)
 		handler.WriteJSON(w, util.MapStr{
-			"error": err,
+			"error": err.Error(),
 		}, 500)
 	}
 
@@ -206,8 +233,75 @@ func (handler *API) ProxyAction(w http.ResponseWriter, req *http.Request) {
 	default:
 		handler.WriteJSON(w, util.MapStr{
 			"error": fmt.Sprintf("method %s is not supported", req.Method),
-		}, 200)
+		}, 500)
 		return
 	}
 
+}
+
+//curl  -XPOST http://localhost:2900/_proxy/request/redo -d'{"ids":["bb6t4cqaukihf1ag10q0","bb6t4daaukihf1ag10r0"]}'
+//{
+//"acknowledge": true,
+//"result": {
+//"bb6t4cqaukihf1ag10q0": "{\"_index\":\"myindex\",\"_type\":\"doc\",\"_id\":\"1\",\"_version\":17,\"result\":\"updated\",\"_shards\":{\"total\":2,\"successful\":1,\"failed\":0},\"_seq_no\":16,\"_primary_term\":2}",
+//"bb6t4daaukihf1ag10r0": "{\"_index\":\"myindex\",\"_type\":\"doc\",\"_id\":\"1\",\"_version\":18,\"result\":\"updated\",\"_shards\":{\"total\":2,\"successful\":1,\"failed\":0},\"_seq_no\":17,\"_primary_term\":2}"
+//}
+//}
+func (handler *API) RedoRequestsAction(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+
+	//TODO check status, add `force` parameter to force execute the replay
+	json, err := handler.GetJSON(req)
+	if err != nil {
+		log.Error(err)
+		handler.WriteJSON(w, util.MapStr{
+			"error": err.Error(),
+		}, 500)
+		return
+	}
+
+	ids, err := json.ArrayOfStrings("ids")
+	if err != nil {
+		log.Error(err)
+		handler.WriteJSON(w, util.MapStr{
+			"error": err.Error(),
+		}, 500)
+		return
+	}
+	ack := true
+	msg := util.MapStr{}
+	for _, id := range ids {
+		request, err := model.GetRequest(id)
+		if err != nil {
+			log.Error(err)
+			ack = false
+			msg[id] = err.Error()
+			continue
+		}
+
+		//replay request
+		cfg := config.GetUpstreamConfig(request.Upstream)
+		result, err := handler.executeHttpRequest(cfg.Elasticsearch, request.Url, request.Method, []byte(request.Body))
+
+		//update request status
+		request.Status = model.ReplayedSuccess
+		request.Updated = time.Now()
+		request.Response = string(result.Body)
+		request.ResponseSize = int64(result.Size)
+		request.ResponseStatusCode = result.StatusCode
+		msg[id] = request.Response
+
+		if err != nil {
+			request.Status = model.ReplayedFailure
+			request.Message = err.Error()
+			ack = false
+			msg[id] = err.Error()
+		}
+
+		model.UpdateRequest(&request)
+	}
+
+	handler.WriteJSON(w, util.MapStr{
+		"acknowledge": ack,
+		"result":      msg,
+	}, 500)
 }

@@ -3,11 +3,14 @@ package pipelines
 import (
 	"fmt"
 	log "github.com/cihub/seelog"
+	"github.com/infinitbyte/framework/core/errors"
+	"github.com/infinitbyte/framework/core/filter"
 	"github.com/infinitbyte/framework/core/global"
 	"github.com/infinitbyte/framework/core/pipeline"
 	"github.com/infinitbyte/framework/core/queue"
 	"github.com/infinitbyte/framework/core/util"
 	"github.com/medcl/elasticsearch-proxy/config"
+	"github.com/medcl/elasticsearch-proxy/model"
 )
 
 type IndexJoint struct {
@@ -39,7 +42,7 @@ func (joint IndexJoint) Process(c *pipeline.Context) error {
 
 	if err != nil {
 		log.Error(err)
-		joint.handleError(c)
+		joint.handleError(c, err)
 		return nil
 	}
 
@@ -51,28 +54,46 @@ func (joint IndexJoint) Process(c *pipeline.Context) error {
 		log.Debug("response: ", body, ",", string(response.Body))
 	}
 
-	if response.StatusCode >= 400 {
-		log.Error("response: ", body, ",", response.StatusCode, ",", string(response.Body))
-		joint.handleError(c)
-		return nil
-	}
-
 	c.Set(config.ResponseSize, response.Size)
 	c.Set(config.ResponseStatusCode, response.StatusCode)
 	c.Set(config.Response, response.Body)
 
+	if response.StatusCode >= 400 {
+		err := errors.Errorf("response: ", body, ",", response.StatusCode, ",", string(response.Body))
+		log.Error(err)
+		joint.handleError(c, err)
+		return nil
+	}
+
 	return nil
 }
 
-func (joint IndexJoint) handleError(c *pipeline.Context) {
+func (joint IndexJoint) handleError(c *pipeline.Context, err error) {
 
 	//TODO move to standard error pipeline process
 	// handle error
 	// stop ingestion, record the current request and error message
 	// mark this upstream as inactive,
 	// waiting for manual active, and manually redo the request
-
 	upstream := c.MustGetString(config.Upstream)
+	filter.Add(config.InactiveUpstream, []byte(upstream))
 	config.UpdateUpstreamConfigStatus(upstream, false)
 	queue.PauseRead(upstream)
+	c.Set(config.Message, err.Error())
+
+	//save msg, TODO remove below, use logging joint to process the save process
+	request := model.Request{}
+	request.Status=model.Created
+	request.Url = c.MustGetString(config.Url)
+	request.Upstream = c.MustGetString(config.Upstream)
+	request.Method = c.MustGetString(config.Method)
+	request.Body = c.GetStringOrDefault(config.Body, "")
+	request.Message = c.GetStringOrDefault(config.Message, "")
+	if(c.Has(config.ResponseStatusCode)){
+		request.ResponseStatusCode=c.MustGetInt(config.ResponseStatusCode)
+	}
+	request.ResponseSize=c.GetInt64OrDefault(config.ResponseSize,0)
+	request.Response=c.GetStringOrDefault(config.Response,"")
+	model.CreateRequest(&request)
+
 }

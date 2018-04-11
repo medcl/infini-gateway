@@ -20,8 +20,10 @@ import (
 	_ "expvar"
 	"github.com/infinitbyte/framework"
 	"github.com/infinitbyte/framework/core/module"
+	orm "github.com/infinitbyte/framework/core/persist"
 	"github.com/infinitbyte/framework/core/util"
 	"github.com/infinitbyte/framework/modules/api"
+	"github.com/infinitbyte/framework/modules/filter"
 	"github.com/infinitbyte/framework/modules/persist"
 	"github.com/infinitbyte/framework/modules/pipeline"
 	"github.com/infinitbyte/framework/modules/queue"
@@ -29,6 +31,7 @@ import (
 	"github.com/infinitbyte/framework/modules/storage"
 	"github.com/infinitbyte/framework/modules/ui"
 	"github.com/medcl/elasticsearch-proxy/config"
+	"github.com/medcl/elasticsearch-proxy/model"
 	"github.com/medcl/elasticsearch-proxy/plugin"
 )
 
@@ -56,6 +59,7 @@ func main() {
 		//load core modules first
 		module.Register(module.Database, persist.DatabaseModule{})
 		module.Register(module.Storage, storage.StorageModule{})
+		module.Register(module.Filter, filter.FilterModule{})
 		module.Register(module.Stats, stats.SimpleStatsModule{})
 		module.Register(module.Queue, queue.DiskQueue{})
 		module.Register(module.System, pipeline.PipelineFrameworkModule{})
@@ -67,6 +71,8 @@ func main() {
 
 		//start modules
 		module.Start()
+
+		orm.RegisterSchema(&model.Request{})
 
 	})
 

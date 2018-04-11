@@ -45,9 +45,6 @@ modules:
           joint: index
           enabled: true
         process: []
-        end:
-          joint: logging
-          enabled: true
         error:
           joint: on_error
           enabled: true
@@ -62,9 +59,6 @@ modules:
           joint: index
           enabled: true
         process: []
-        end:
-          joint: logging
-          enabled: true
         error:
           joint: on_error
           enabled: true

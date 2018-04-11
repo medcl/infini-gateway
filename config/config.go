@@ -37,6 +37,10 @@ const Upstream pipeline.ParaKey = "upstream"
 const Response pipeline.ParaKey = "response"
 const ResponseSize pipeline.ParaKey = "response_size"
 const ResponseStatusCode pipeline.ParaKey = "response_code"
+const Message pipeline.ParaKey = "message"
+
+//Bucket
+const InactiveUpstream = "inactive_upstream"
 
 var upstreams map[string]UpstreamConfig = map[string]UpstreamConfig{}
 
