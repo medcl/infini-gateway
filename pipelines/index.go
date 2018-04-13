@@ -75,25 +75,29 @@ func (joint IndexJoint) handleError(c *pipeline.Context, err error) {
 	// stop ingestion, record the current request and error message
 	// mark this upstream as inactive,
 	// waiting for manual active, and manually redo the request
-	upstream := c.MustGetString(config.Upstream)
-	filter.Add(config.InactiveUpstream, []byte(upstream))
-	config.UpdateUpstreamConfigStatus(upstream, false)
-	queue.PauseRead(upstream)
+
+	if c.Has(config.Upstream) {
+		upstream := c.MustGetString(config.Upstream)
+		filter.Add(config.InactiveUpstream, []byte(upstream))
+		config.UpdateUpstreamWriteableStatus(upstream, false)
+		queue.PauseRead(upstream)
+	}
+
 	c.Set(config.Message, err.Error())
 
 	//save msg, TODO remove below, use logging joint to process the save process
 	request := model.Request{}
-	request.Status=model.Created
+	request.Status = model.Created
 	request.Url = c.MustGetString(config.Url)
 	request.Upstream = c.MustGetString(config.Upstream)
 	request.Method = c.MustGetString(config.Method)
 	request.Body = c.GetStringOrDefault(config.Body, "")
 	request.Message = c.GetStringOrDefault(config.Message, "")
-	if(c.Has(config.ResponseStatusCode)){
-		request.ResponseStatusCode=c.MustGetInt(config.ResponseStatusCode)
+	if c.Has(config.ResponseStatusCode) {
+		request.ResponseStatusCode = c.MustGetInt(config.ResponseStatusCode)
 	}
-	request.ResponseSize=c.GetInt64OrDefault(config.ResponseSize,0)
-	request.Response=c.GetStringOrDefault(config.Response,"")
+	request.ResponseSize = c.GetInt64OrDefault(config.ResponseSize, 0)
+	request.Response = c.GetStringOrDefault(config.Response, "")
 	model.CreateRequest(&request)
 
 }

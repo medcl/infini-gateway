@@ -32,7 +32,7 @@ type Request struct {
 	Upstream           string    `json:"upstream"`
 	Response           string    `json:"response"`
 	ResponseSize       int64     `json:"response_size"`
-	ResponseStatusCode int     `json:"response_code"`
+	ResponseStatusCode int       `json:"response_code"`
 	Created            time.Time `json:"created"`
 	Updated            time.Time `json:"updated"`
 	Status             int       `json:"status"`

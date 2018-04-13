@@ -25,7 +25,7 @@ func (handler *API) IndexAction(w http.ResponseWriter, req *http.Request, _ http
 		log.Debug("parameter upstream: ", upstream)
 
 		cfg := config.GetUpstreamConfig(upstream)
-		if cfg.Enabled && cfg.Active {
+		if cfg.Enabled && cfg.Writeable {
 
 			response, err := handler.executeHttpRequest(cfg.Elasticsearch, req.URL.String(), req.Method, nil)
 			if err != nil {
@@ -42,7 +42,7 @@ func (handler *API) IndexAction(w http.ResponseWriter, req *http.Request, _ http
 			return
 		} else {
 			handler.WriteJSON(w, util.MapStr{
-				"error": "upstram is not exist nor active",
+				"error": "upstram is not exist nor readable",
 			}, 500)
 			return
 		}
@@ -81,12 +81,13 @@ func (handler *API) executeHttpRequest(cfg index.ElasticsearchConfig, url, metho
 }
 
 func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []byte) {
+
 	upstream := handler.GetHeader(req, "UPSTREAM", "auto")
 	if upstream != "auto" {
 		log.Debug("parameter upstream: ", upstream)
 
 		cfg := config.GetUpstreamConfig(upstream)
-		if cfg.Enabled && cfg.Active {
+		if cfg.Enabled && cfg.Readable {
 
 			response, err := handler.executeHttpRequest(cfg.Elasticsearch, req.URL.String(), req.Method, body)
 			if err != nil {
@@ -111,7 +112,7 @@ func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []
 			return
 		} else {
 			handler.WriteJSON(w, util.MapStr{
-				"error": "upstram is not exist nor active",
+				"error": "upstram is not exist nor readable",
 			}, 500)
 			return
 		}
@@ -119,7 +120,7 @@ func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []
 
 	ups := config.GetUpstreamConfigs()
 	for _, v := range ups {
-		if v.Enabled && v.Active {
+		if v.Enabled && v.Readable {
 
 			cfg := v.Elasticsearch
 			response, err := handler.executeHttpRequest(cfg, req.URL.String(), req.Method, body)
@@ -201,12 +202,21 @@ var noUpstreamMsg = "no upstream available"
 
 func (handler *API) ProxyAction(w http.ResponseWriter, req *http.Request) {
 
+	handler.WriteJSONHeader(w)
+
 	body, err := handler.GetRawBody(req)
 	if err != nil {
 		log.Error(err)
 		handler.WriteJSON(w, util.MapStr{
 			"error": err.Error(),
 		}, 500)
+	}
+
+	if global.Env().IsDebug {
+		log.Debug(req.URL)
+		log.Debug(req.Method)
+		log.Debug(string(body))
+		log.Debug("request: ", string(body))
 	}
 
 	ups := config.GetUpstreamConfigs()
@@ -231,8 +241,16 @@ func (handler *API) ProxyAction(w http.ResponseWriter, req *http.Request) {
 		handler.handleWrite(w, req, body)
 		break
 	default:
+		methodNotAllowed := fmt.Sprintf("method %s is not supported", req.Method)
+		request := model.Request{}
+		request.Url = req.URL.String()
+		request.Method = req.Method
+		request.Body = string(body)
+		request.Message = err.Error()
+		model.CreateRequest(&request)
+
 		handler.WriteJSON(w, util.MapStr{
-			"error": fmt.Sprintf("method %s is not supported", req.Method),
+			"error": methodNotAllowed,
 		}, 500)
 		return
 	}

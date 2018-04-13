@@ -15,6 +15,7 @@ func InitAPI() {
 	apis := API{}
 
 	//Index
+	api.HandleAPIMethod(api.HEAD, "/", apis.IndexAction)
 	api.HandleAPIMethod(api.GET, "/", apis.IndexAction)
 	api.HandleAPIMethod(api.GET, "/favicon.ico", apis.FaviconAction)
 
