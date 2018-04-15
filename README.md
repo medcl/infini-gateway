@@ -161,7 +161,7 @@ curl -XPOST http://localhost:2900/_proxy/queue/resume -d'{"queue":"primary"}'
 ```
 - Get Error requests
 ```
-curl  -XGET http://localhost:2900/_proxy/requests/?upstream=primary&status=1
+curl  -XGET http://localhost:2900/_proxy/requests/?from=0&size=20&upstream=primary&status=1
 ```
 - Replay Error log
 ```
