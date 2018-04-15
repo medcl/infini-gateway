@@ -91,6 +91,33 @@ func GetRequest(id string) (Request, error) {
 	return request, err
 }
 
+
+func GetRequestList(from, size int, upstream string, status int) (int, []Request, error) {
+
+	var tasks []Request
+	sort := []persist.Sort{}
+	sort = append(sort, persist.Sort{Field: "created", SortType: persist.DESC})
+	queryO := persist.Query{Sort: &sort, From: from, Size: size}
+	if upstream!="" {
+		queryO.Conds = persist.And(persist.Eq("upstream", upstream))
+	}
+
+	if status >= 0 {
+		queryO.Conds = persist.Combine(queryO.Conds, persist.And(persist.Eq("status", status)))
+	}
+
+	err, result := persist.Search(Request{}, &tasks, &queryO)
+	if err != nil {
+		log.Error(err)
+		return 0, tasks, err
+	}
+	if result.Result != nil && tasks == nil || len(tasks) == 0 {
+		convertRequest(result, &tasks)
+	}
+	return result.Total, tasks, err
+}
+
+
 func GetRequestByField(k, v string) ([]Request, error) {
 	request := Request{}
 	requests := []Request{}

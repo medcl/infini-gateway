@@ -159,6 +159,14 @@ curl -XGET localhost:2900/_proxy/queue/stats
 ```
 curl -XPOST http://localhost:2900/_proxy/queue/resume -d'{"queue":"primary"}'
 ```
+- Get Error requests
+```
+curl  -XGET http://localhost:2900/_proxy/requests/?upstream=primary&status=1
+```
+- Replay Error log
+```
+curl  -XPOST http://localhost:2900/_proxy/request/redo -d'{"ids":["bb6t4cqaukihf1ag10q0","bb6t4daaukihf1ag10r0"]}'
+```
 
 License
 =======

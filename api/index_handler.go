@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"strconv"
 )
 
 // IndexAction returns cluster health information
@@ -276,6 +277,33 @@ func (handler *API) ProxyAction(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+}
+
+
+func (handler *API) GetRequestsAction(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+
+	fr := handler.GetParameter(req, "from")
+	si := handler.GetParameter(req, "size")
+	upstream := handler.GetParameter(req, "upstream")
+	status := handler.GetIntOrDefault(req, "status", -1)
+
+	from, err := strconv.Atoi(fr)
+	if err != nil {
+		from = 0
+	}
+	size, err := strconv.Atoi(si)
+	if err != nil {
+		size = 10
+	}
+
+	total, tasks, err := model.GetRequestList(from, size, upstream, status)
+	if err != nil {
+		handler.WriteJSON(w, util.MapStr{
+			"error": err.Error(),
+		}, 500)
+	} else {
+		handler.WriteJSONListResult(w, total, tasks, http.StatusOK)
+	}
 }
 
 //curl  -XPOST http://localhost:2900/_proxy/request/redo -d'{"ids":["bb6t4cqaukihf1ag10q0","bb6t4daaukihf1ag10r0"]}'
