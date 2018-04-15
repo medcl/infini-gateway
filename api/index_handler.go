@@ -64,7 +64,14 @@ func (handler *API) IndexAction(w http.ResponseWriter, req *http.Request, _ http
 	m := util.MapStr{}
 	for _, v := range ups {
 		if v.Enabled {
-			m[v.Name] = v.Elasticsearch.Endpoint
+			m[v.Name] = util.MapStr{
+				"endpoint":        v.Elasticsearch.Endpoint,
+				"queue":           v.QueueName,
+				"max_queue_depth": v.MaxQueueDepth,
+				"readable":        v.Readable,
+				"writeable":       v.Writeable,
+				"timeout":         v.Timeout,
+			}
 		}
 	}
 	data["upstream"] = m
@@ -159,7 +166,22 @@ func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []
 
 }
 
+// POST should not used to serve as search/read/ requests
 func (handler *API) handleWrite(w http.ResponseWriter, req *http.Request, body []byte) {
+	url := fmt.Sprintf("%s", req.URL)
+
+	//TODO add HEADER to support read through and write through
+
+	//indexing/bulk
+	//_bulk
+	//_delete_by_query?
+	//_update_by_query?
+	//_reindex?
+	if util.ContainsAnyInArray(url, config.GetProxyConfig().PassthroughPatterns) {
+		handler.handleRead(w, req, body)
+		return
+	}
+
 	response := map[string]string{}
 	ack := true
 	ups := config.GetUpstreamConfigs()
@@ -175,7 +197,6 @@ func (handler *API) handleWrite(w http.ResponseWriter, req *http.Request, body [
 				}
 			}
 
-			url := fmt.Sprintf("%s", req.URL)
 			context := pipeline.Context{}
 			context.Set(config.Upstream, v.Name)
 			context.Set(config.Url, url)

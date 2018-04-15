@@ -59,7 +59,7 @@ func (joint IndexJoint) Process(c *pipeline.Context) error {
 	c.Set(config.Response, response.Body)
 
 	if response.StatusCode >= 400 {
-		err := errors.Errorf("response: ", body, ",", response.StatusCode, ",", string(response.Body))
+		err := errors.Errorf("response:%s, %v, %s ", body, response.StatusCode, string(response.Body))
 		log.Error(err)
 		joint.handleError(c, err)
 		return nil

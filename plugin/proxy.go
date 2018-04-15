@@ -17,14 +17,20 @@ func (this ProxyPlugin) Name() string {
 }
 
 var (
-	proxyConfig = config.ProxyConfig{}
+	proxyConfig = config.ProxyConfig{
+		PassthroughPatterns: []string{
+			"_search", "_count", "_analyze", "_mget",
+			"_doc", "_mtermvectors", "_msearch", "_search_shards", "_suggest",
+			"_validate", "_explain", "_field_caps", "_rank_eval", "_aliases",
+			"_open", "_close"},
+	}
 )
 
 func (module ProxyPlugin) Start(cfg *Config) {
 
 	cfg.Unpack(&proxyConfig)
 
-	config.SetUpstream(proxyConfig.Upstream)
+	config.SetProxyConfig(proxyConfig)
 
 	//register UI
 	if proxyConfig.UIEnabled {

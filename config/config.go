@@ -26,9 +26,10 @@ func (v *UpstreamConfig) SafeGetQueueName() string {
 }
 
 type ProxyConfig struct {
-	UIEnabled bool
-	Upstream  []UpstreamConfig `config:"upstream"`
-	Algorithm string
+	UIEnabled           bool
+	Upstream            []UpstreamConfig `config:"upstream"`
+	Algorithm           string           `config:"algorithm"`
+	PassthroughPatterns []string         `config:"pass_through"`
 }
 
 const Url pipeline.ParaKey = "url"
@@ -42,6 +43,8 @@ const Message pipeline.ParaKey = "message"
 
 //Bucket
 const InactiveUpstream = "inactive_upstream"
+
+var proxyConfig ProxyConfig
 
 var upstreams map[string]UpstreamConfig = map[string]UpstreamConfig{}
 
@@ -65,12 +68,22 @@ func UpdateUpstreamWriteableStatus(key string, active bool) {
 	v.Writeable = active
 	upstreams[key] = v
 }
+
 func UpdateUpstreamReadableStatus(key string, active bool) {
 	l.Lock()
 	defer l.Unlock()
 	v := upstreams[key]
 	v.Readable = active
 	upstreams[key] = v
+}
+
+func GetProxyConfig() ProxyConfig {
+	return proxyConfig
+}
+
+func SetProxyConfig(cfg ProxyConfig) {
+	proxyConfig = cfg
+	SetUpstream(cfg.Upstream)
 }
 
 func SetUpstream(ups []UpstreamConfig) {

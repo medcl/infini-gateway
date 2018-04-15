@@ -10,6 +10,7 @@ modules:
 plugins:
 - name: proxy
   enabled: true
+  pass_through: ["_search", "_count", "_analyze", "_mget", "_doc", "_mtermvectors", "_msearch", "_search_shards", "_suggest", "_validate", "_explain", "_field_caps", "_rank_eval", "_aliases"]
   upstream:
   - name: primary
     enabled: true
