@@ -1,4 +1,4 @@
-package elasticsearch_proxy
+package plugin
 
 import (
 	. "github.com/infinitbyte/framework/core/config"
@@ -26,22 +26,27 @@ var (
 	}
 )
 
-func (module ProxyPlugin) Start(cfg *Config) {
-
+func (module ProxyPlugin) Setup(cfg *Config) {
 	cfg.Unpack(&proxyConfig)
 
 	config.SetProxyConfig(proxyConfig)
-
-	//register UI
-	if proxyConfig.UIEnabled {
-		ui.InitUI()
-	}
 
 	api.InitAPI()
 
 	//register pipeline joints
 	pipeline.RegisterPipeJoint(pipelines.IndexJoint{})
 	pipeline.RegisterPipeJoint(pipelines.LoggingJoint{})
+
+}
+
+func (module ProxyPlugin) Start() error {
+
+	//register UI
+	if proxyConfig.UIEnabled {
+		ui.InitUI()
+	}
+
+	return nil
 }
 
 func (module ProxyPlugin) Stop() error {

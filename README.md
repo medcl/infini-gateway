@@ -18,23 +18,32 @@ PROXY, a lightweight elasticsearch proxy written in golang.
 - First, setup upstream config in the `proxy.yml`.
 
 ```
+elasticsearch:
+- name: default
+  enabled: true
+  endpoint: http://localhost:9200
+  index_prefix: proxy-
+  basic_auth:
+    username: elastic
+    password: changeme
+- name: backup
+  enabled: true
+  endpoint: http://localhost:9201
+  index_prefix: proxy-
+  basic_auth:
+    username: elastic
+    password: changeme
+
 plugins:
 - name: proxy
   enabled: true
   upstream:
   - name: primary
     enabled: true
-    elasticsearch:
-      endpoint: http://localhost:9200
-      username: elastic
-      password: changeme
+    elasticsearch: default
   - name: backup
-    enabled: false
-    elasticsearch:
-     endpoint: http://localhost:9201
-     username: elastic
-     password: changeme
-
+    enabled: true
+    elasticsearch: backup
 ```
 - Start the PROXY.
 

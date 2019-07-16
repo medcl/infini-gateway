@@ -3,6 +3,7 @@ package pipelines
 import (
 	"fmt"
 	log "github.com/cihub/seelog"
+	"github.com/infinitbyte/framework/core/elastic"
 	"github.com/infinitbyte/framework/core/errors"
 	"github.com/infinitbyte/framework/core/filter"
 	"github.com/infinitbyte/framework/core/global"
@@ -26,18 +27,25 @@ func (joint IndexJoint) Process(c *pipeline.Context) error {
 
 	cfg := config.GetUpstreamConfig(upstream)
 
-	url := fmt.Sprintf("%s%s", cfg.Elasticsearch.Endpoint, c.MustGetString(config.Url))
+	esConfig := elastic.GetConfig(cfg.Elasticsearch)
+
+	url := fmt.Sprintf("%s%s", esConfig.Endpoint, c.MustGetString(config.Url))
 
 	method := c.MustGetString(config.Method)
 	request := util.NewRequest(method, url)
 
 	body, ok := c.GetString(config.Body)
 
-	if ok {
+	if ok && body != "" {
 		request.Body = []byte(body)
 	}
 
-	request.SetBasicAuth(cfg.Elasticsearch.Username, cfg.Elasticsearch.Password)
+	if esConfig.BasicAuth != nil {
+		request.SetBasicAuth(esConfig.BasicAuth.Username, esConfig.BasicAuth.Password)
+	}
+
+	request.SetContentType(util.ContentTypeJson)
+
 	response, err := util.ExecuteRequest(request)
 
 	if err != nil {

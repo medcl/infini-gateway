@@ -9,7 +9,6 @@ before_install:
   - go get github.com/mattn/goveralls
   - go get github.com/golang/lint/golint
   - go get honnef.co/go/tools/cmd/megacheck
-  - go get github.com/infinitbyte/framework
 
 script:
   - make clean config build

@@ -45,5 +45,5 @@ bin/
 /bin-run/
 /leveldb
 /dist
-gopa
-gopa.exe
+vendor
+

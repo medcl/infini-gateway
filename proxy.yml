@@ -1,37 +1,69 @@
 path.data: data
 path.logs: log
 
-api_bind: 0.0.0.0:2900
+network:
+#  http_bind: 0.0.0.0:9000
+  api_bind: 0.0.0.0:2900
 
 modules:
 - name: api
   enabled: true
 
+elasticsearch:
+- name: default
+  enabled: true
+  endpoint: http://localhost:9200
+  index_prefix: proxy-
+#  basic_auth:
+#    username: elastic
+#    password: changeme
+
 plugins:
 - name: proxy
   enabled: true
-  pass_through: ["_search", "_count", "_analyze", "_mget", "_doc", "_mtermvectors", "_msearch", "_search_shards", "_suggest", "_validate", "_explain", "_field_caps", "_rank_eval", "_aliases"]
+  ui_enabled: true
+  pass_through: ["_update","_search", "_count", "_analyze", "_mget", "_doc", "_mtermvectors", "_msearch", "_search_shards", "_suggest", "_validate", "_explain", "_field_caps", "_rank_eval", "_aliases"]
   upstream:
   - name: primary
     enabled: true
     queue_name: primary
     max_queue_depth: -1
     timeout: 60s
-    elasticsearch:
-      endpoint: http://localhost:9200
-      username: elastic
-      password: changeme
+    elasticsearch: default
   - name: backup
-    enabled: true
+    enabled: false
     queue_name: backup
     max_queue_depth: -1
     timeout: 60s
-    elasticsearch:
-     endpoint: http://localhost:9201
-     username: elastic
-     password: changeme
+    elasticsearch: default
+
+pipelines:
+- name: primary
+  start:
+    joint: index
+    enabled: true
+  process: []
+  error:
+    joint: logging
+    enabled: true
+- name: backup
+  start:
+    joint: index
+    enabled: true
+  process: []
+  error:
+    joint: logging
+    enabled: true
+
 
 modules:
+- name: elastic
+  elasticsearch: default
+  enabled: true
+  indexer_enabled: true
+  store_enabled: true
+  orm_enabled: true
+
 - name: pipeline
   enabled: true
   runners:
@@ -41,25 +73,12 @@ modules:
       max_go_routine: 3
       threshold_in_ms: 0
       timeout_in_ms: 5000
-      default_config:
-        start:
-          joint: index
-          enabled: true
-        process: []
-        error:
-          joint: on_error
-          enabled: true
+      pipeline_id: primary
+
     - name: backup
       enabled: true
       input_queue: backup
       max_go_routine: 1
       threshold_in_ms: 0
       timeout_in_ms: 5000
-      default_config:
-        start:
-          joint: index
-          enabled: true
-        process: []
-        error:
-          joint: on_error
-          enabled: true
+      pipeline_id: backup

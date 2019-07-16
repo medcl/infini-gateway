@@ -1,20 +1,19 @@
 package config
 
 import (
-	"github.com/infinitbyte/framework/core/index"
 	"github.com/infinitbyte/framework/core/pipeline"
 	"sync"
 )
 
 type UpstreamConfig struct {
-	Name          string                    `config:"name"`
-	QueueName     string                    `config:"queue_name"`
-	MaxQueueDepth int64                     `config:"max_queue_depth"`
-	Enabled       bool                      `config:"enabled"`
-	Writeable     bool                      `config:"writeable"`
-	Readable      bool                      `config:"readable"`
-	Timeout       string                    `config:"timeout"`
-	Elasticsearch index.ElasticsearchConfig `config:"elasticsearch"`
+	Name          string `config:"name"`
+	QueueName     string `config:"queue_name"`
+	MaxQueueDepth int64  `config:"max_queue_depth"`
+	Enabled       bool   `config:"enabled"`
+	Writeable     bool   `config:"writeable"`
+	Readable      bool   `config:"readable"`
+	Timeout       string `config:"timeout"`
+	Elasticsearch string `config:"elasticsearch"`
 }
 
 func (v *UpstreamConfig) SafeGetQueueName() string {
@@ -26,7 +25,7 @@ func (v *UpstreamConfig) SafeGetQueueName() string {
 }
 
 type ProxyConfig struct {
-	UIEnabled           bool
+	UIEnabled           bool             `config:"ui_enabled"`
 	Upstream            []UpstreamConfig `config:"upstream"`
 	Algorithm           string           `config:"algorithm"`
 	PassthroughPatterns []string         `config:"pass_through"`

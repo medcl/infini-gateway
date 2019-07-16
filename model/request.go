@@ -19,13 +19,13 @@ package model
 import (
 	log "github.com/cihub/seelog"
 	"github.com/infinitbyte/framework/core/errors"
-	"github.com/infinitbyte/framework/core/persist"
+	"github.com/infinitbyte/framework/core/orm"
 	"github.com/infinitbyte/framework/core/util"
 	"time"
 )
 
 type Request struct {
-	ID                 string    `gorm:"not null;unique;primary_key" json:"id" index:"id"`
+	ID                 string    `gorm:"not null;unique;primary_key" json:"id" elastic_meta:"_id"`
 	Url                string    `json:"url"`
 	Method             string    `json:"method"`
 	Body               string    `json:"body"`
@@ -51,7 +51,7 @@ func CreateRequest(request *Request) error {
 	request.Created = time
 	request.Updated = time
 
-	err := persist.Save(request)
+	err := orm.Save(request)
 	if err != nil {
 		log.Error(request, ", ", err)
 	}
@@ -64,12 +64,12 @@ func UpdateRequest(request *Request) error {
 	if request.Url == "" {
 		return errors.New("url can't be nil")
 	}
-	return persist.Update(request)
+	return orm.Update(request)
 }
 
 func DeleteRequest(id string) error {
 	request := Request{ID: id}
-	err := persist.Delete(&request)
+	err := orm.Delete(&request)
 	if err != nil {
 		log.Error(id, ", ", err)
 	}
@@ -79,7 +79,7 @@ func DeleteRequest(id string) error {
 func GetRequest(id string) (Request, error) {
 	request := Request{}
 	request.ID = id
-	err := persist.Get(&request)
+	err := orm.Get(&request)
 	if err != nil {
 		log.Error(id, ", ", err)
 	}
@@ -91,22 +91,21 @@ func GetRequest(id string) (Request, error) {
 	return request, err
 }
 
-
 func GetRequestList(from, size int, upstream string, status int) (int, []Request, error) {
 
 	var tasks []Request
-	sort := []persist.Sort{}
-	sort = append(sort, persist.Sort{Field: "created", SortType: persist.DESC})
-	queryO := persist.Query{Sort: &sort, From: from, Size: size}
-	if upstream!="" {
-		queryO.Conds = persist.And(persist.Eq("upstream", upstream))
+	sort := []orm.Sort{}
+	sort = append(sort, orm.Sort{Field: "created", SortType: orm.DESC})
+	queryO := orm.Query{Sort: &sort, From: from, Size: size}
+	if upstream != "" {
+		queryO.Conds = orm.And(orm.Eq("upstream", upstream))
 	}
 
 	if status >= 0 {
-		queryO.Conds = persist.Combine(queryO.Conds, persist.And(persist.Eq("status", status)))
+		queryO.Conds = orm.Combine(queryO.Conds, orm.And(orm.Eq("status", status)))
 	}
 
-	err, result := persist.Search(Request{}, &tasks, &queryO)
+	err, result := orm.Search(Request{}, &tasks, &queryO)
 	if err != nil {
 		log.Error(err)
 		return 0, tasks, err
@@ -117,11 +116,10 @@ func GetRequestList(from, size int, upstream string, status int) (int, []Request
 	return result.Total, tasks, err
 }
 
-
 func GetRequestByField(k, v string) ([]Request, error) {
 	request := Request{}
 	requests := []Request{}
-	err, result := persist.GetBy(k, v, request, &requests)
+	err, result := orm.GetBy(k, v, request, &requests)
 
 	if err != nil {
 		log.Error(k, ", ", err)
@@ -134,7 +132,7 @@ func GetRequestByField(k, v string) ([]Request, error) {
 	return requests, err
 }
 
-func convertRequest(result persist.Result, requests *[]Request) {
+func convertRequest(result orm.Result, requests *[]Request) {
 	if result.Result == nil {
 		return
 	}

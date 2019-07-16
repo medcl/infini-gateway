@@ -4,18 +4,18 @@ import (
 	"fmt"
 	log "github.com/cihub/seelog"
 	"github.com/infinitbyte/framework/core/api/router"
+	"github.com/infinitbyte/framework/core/elastic"
 	"github.com/infinitbyte/framework/core/env"
 	"github.com/infinitbyte/framework/core/global"
-	"github.com/infinitbyte/framework/core/index"
 	"github.com/infinitbyte/framework/core/pipeline"
 	"github.com/infinitbyte/framework/core/queue"
 	"github.com/infinitbyte/framework/core/util"
 	"github.com/medcl/elasticsearch-proxy/config"
 	"github.com/medcl/elasticsearch-proxy/model"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
-	"strconv"
 )
 
 // IndexAction returns cluster health information
@@ -28,7 +28,7 @@ func (handler *API) IndexAction(w http.ResponseWriter, req *http.Request, _ http
 		cfg := config.GetUpstreamConfig(upstream)
 		if cfg.Enabled && cfg.Writeable {
 
-			response, err := handler.executeHttpRequest(cfg.Elasticsearch, req.URL.String(), req.Method, nil)
+			response, err := handler.executeHttpRequest(elastic.GetConfig(cfg.Elasticsearch), req.URL.String(), req.Method, nil)
 			if err != nil {
 				log.Error(err)
 
@@ -62,11 +62,15 @@ func (handler *API) IndexAction(w http.ResponseWriter, req *http.Request, _ http
 	data["uptime"] = time.Since(env.GetStartTime()).String()
 
 	ups := config.GetUpstreamConfigs()
+
+	log.Error(ups)
+
 	m := util.MapStr{}
 	for _, v := range ups {
+		cfg := elastic.GetConfig(v.Elasticsearch)
 		if v.Enabled {
 			m[v.Name] = util.MapStr{
-				"endpoint":        v.Elasticsearch.Endpoint,
+				"endpoint":        cfg.Endpoint,
 				"queue":           v.QueueName,
 				"max_queue_depth": v.MaxQueueDepth,
 				"readable":        v.Readable,
@@ -80,11 +84,13 @@ func (handler *API) IndexAction(w http.ResponseWriter, req *http.Request, _ http
 	handler.WriteJSON(w, &data, http.StatusOK)
 }
 
-func (handler *API) executeHttpRequest(cfg index.ElasticsearchConfig, url, method string, body []byte) (*util.Result, error) {
+func (handler *API) executeHttpRequest(cfg elastic.ElasticsearchConfig, url, method string, body []byte) (*util.Result, error) {
 	url = fmt.Sprintf("%s%s", cfg.Endpoint, url)
 	request := util.NewPostRequest(url, body)
 	request.Method = method
-	request.SetBasicAuth(cfg.Username, cfg.Password)
+	if cfg.BasicAuth != nil {
+		request.SetBasicAuth(cfg.BasicAuth.Username, cfg.BasicAuth.Password)
+	}
 	return util.ExecuteRequest(request)
 }
 
@@ -97,7 +103,7 @@ func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []
 		cfg := config.GetUpstreamConfig(upstream)
 		if cfg.Enabled && cfg.Readable {
 
-			response, err := handler.executeHttpRequest(cfg.Elasticsearch, req.URL.String(), req.Method, body)
+			response, err := handler.executeHttpRequest(elastic.GetConfig(cfg.Elasticsearch), req.URL.String(), req.Method, body)
 			if err != nil {
 				log.Error(err)
 
@@ -130,8 +136,7 @@ func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []
 	for _, v := range ups {
 		if v.Enabled && v.Readable {
 
-			cfg := v.Elasticsearch
-			response, err := handler.executeHttpRequest(cfg, req.URL.String(), req.Method, body)
+			response, err := handler.executeHttpRequest(elastic.GetConfig(v.Elasticsearch), req.URL.String(), req.Method, body)
 
 			if err != nil {
 				log.Error(err)
@@ -178,7 +183,9 @@ func (handler *API) handleWrite(w http.ResponseWriter, req *http.Request, body [
 	//_delete_by_query?
 	//_update_by_query?
 	//_reindex?
-	if util.ContainsAnyInArray(url, config.GetProxyConfig().PassthroughPatterns) {
+	//xxx?refresh=yy
+	if util.ContainsAnyInArray(url, config.GetProxyConfig().PassthroughPatterns) ||
+		(handler.GetParameter(req, "refresh") != "") {
 		handler.handleRead(w, req, body)
 		return
 	}
@@ -279,7 +286,6 @@ func (handler *API) ProxyAction(w http.ResponseWriter, req *http.Request) {
 
 }
 
-
 func (handler *API) GetRequestsAction(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 
 	fr := handler.GetParameter(req, "from")
@@ -347,7 +353,7 @@ func (handler *API) RedoRequestsAction(w http.ResponseWriter, req *http.Request,
 
 		//replay request
 		cfg := config.GetUpstreamConfig(request.Upstream)
-		result, err := handler.executeHttpRequest(cfg.Elasticsearch, request.Url, request.Method, []byte(request.Body))
+		result, err := handler.executeHttpRequest(elastic.GetConfig(cfg.Elasticsearch), request.Url, request.Method, []byte(request.Body))
 
 		//update request status
 		request.Status = model.ReplayedSuccess
