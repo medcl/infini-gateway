@@ -63,8 +63,6 @@ func (handler *API) IndexAction(w http.ResponseWriter, req *http.Request, _ http
 
 	ups := config.GetUpstreamConfigs()
 
-	log.Error(ups)
-
 	m := util.MapStr{}
 	for _, v := range ups {
 		cfg := elastic.GetConfig(v.Elasticsearch)
@@ -94,7 +92,26 @@ func (handler *API) executeHttpRequest(cfg elastic.ElasticsearchConfig, url, met
 	return util.ExecuteRequest(request)
 }
 
+func getHash(req *http.Request, body []byte) string {
+	return util.MD5digest(fmt.Sprintf("%s-%s", req.URL, string(body)))
+}
+
 func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []byte) {
+
+	hash := getHash(req, body)
+
+	if handler.cacheConfig.CacheEnabled {
+		cache, _ := handler.redis.Get(hash).Result()
+		if cache != "" {
+			if global.Env().IsDebug {
+				log.Trace("hit cache: ", req.URL, ",", cache)
+			}
+			w.Header().Add("upstream", "cache")
+			w.WriteHeader(200)
+			w.Write([]byte(cache))
+			return
+		}
+	}
 
 	upstream := handler.GetHeader(req, "UPSTREAM", "auto")
 	if upstream != "auto" {
@@ -123,6 +140,14 @@ func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []
 			w.Header().Add("upstream", cfg.Name)
 			w.WriteHeader(response.StatusCode)
 			w.Write(response.Body)
+
+			if handler.cacheConfig.CacheEnabled {
+				handler.redis.Set(hash, string(response.Body), 10*time.Second).Err()
+				if global.Env().IsDebug {
+					log.Debug("update cache: ", hash)
+				}
+			}
+
 			return
 		} else {
 			handler.WriteJSON(w, util.MapStr{
@@ -161,6 +186,13 @@ func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []
 			w.Header().Add("upstream", v.Name)
 			w.WriteHeader(response.StatusCode)
 			w.Write(response.Body)
+
+			if handler.cacheConfig.CacheEnabled {
+				handler.redis.Set(hash, string(response.Body), 10*time.Second).Err()
+				if global.Env().IsDebug {
+					log.Debug("update cache: ", hash)
+				}
+			}
 
 			return
 		}

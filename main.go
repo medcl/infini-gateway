@@ -43,6 +43,7 @@ func main() {
 		util.TrimSpaces(config.Version), util.TrimSpaces(config.LastCommitLog), util.TrimSpaces(config.BuildDate), terminalHeader, terminalFooter)
 
 	app.Init(nil)
+
 	defer app.Shutdown()
 
 	app.Start(func() {

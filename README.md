@@ -5,6 +5,7 @@ PROXY, a lightweight elasticsearch proxy written in golang.
 - Auto handling upstream failure while indexing, aka nonstop indexing
 - Auto detect the upstream failure in search
 - Multiple write mechanism, one indexing request map to multi remote elasticsearch clusters
+- Support TLS/HTTPS, generate the certs files automatically
 - Support run background as daemon mode(only available on linux and macOS)
 - Auto merge indexing operations to single bulk operation(WIP)
 - Load balancing(indexing and search request), algorithm configurable(WIP)
