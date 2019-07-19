@@ -98,9 +98,12 @@ func getHash(keyPrefix string, req *http.Request, body []byte) string {
 
 func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []byte) {
 
-	hash := getHash(handler.cacheConfig.KeyPrefix, req, body)
+	var hash string
 
 	if handler.cacheConfig.CacheEnabled {
+
+		hash = getHash(handler.cacheConfig.KeyPrefix, req, body)
+
 		cache, _ := handler.redis.Get(hash).Result()
 		if cache != "" {
 			if global.Env().IsDebug {

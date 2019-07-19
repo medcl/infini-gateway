@@ -27,14 +27,14 @@ elasticsearch:
 #    password: changeme
 
 cache:
-  enabled: false
+  enabled: true
   redis:
     host: localhost
     port: 6379
     password: ""
     db: 0
   #Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-  ttl: 10s
+  ttl: 60s
 
 plugins:
 - name: proxy
