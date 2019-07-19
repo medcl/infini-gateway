@@ -2,9 +2,11 @@ package api
 
 import (
 	log "github.com/cihub/seelog"
+	"github.com/golang/go/src/pkg/fmt"
 	"github.com/infinitbyte/framework/core/api"
 	"github.com/infinitbyte/framework/core/env"
 	"src/github.com/go-redis/redis"
+	"time"
 )
 
 // API namespace
@@ -14,26 +16,55 @@ type API struct {
 	cacheConfig CacheConfig
 }
 
+type RedisConfig struct {
+	Host     string `config:"host"`
+	Port     string `config:"port"`
+	Password string `config:"password"`
+	DB       int    `config:"db"`
+}
+
 type CacheConfig struct {
-	CacheEnabled bool `config:"enabled"`
+	CacheEnabled bool   `config:"enabled"`
+	KeyPrefix    string `config:"key_prefix"`
+	TTL          string `config:"ttl"`
+	duration     *time.Duration
+	RedisConfig  RedisConfig `config:"redis"`
+}
+
+func (config CacheConfig) GetTTLDuration() *time.Duration {
+	if config.duration != nil {
+		return config.duration
+	}
+
+	if config.TTL != "" {
+		dur, err := time.ParseDuration(config.TTL)
+		if err != nil {
+			dur, _ = time.ParseDuration("10s")
+		}
+		config.duration = &dur
+	}
+	return config.duration
 }
 
 // InitAPI init apis
 func InitAPI() {
 
-	cacheConfig := CacheConfig{}
+	cacheConfig := CacheConfig{
+		KeyPrefix:   "proxy_",
+		RedisConfig: RedisConfig{Host: "localhost", Port: "6379", Password: "", DB: 0},
+	}
 
 	env.ParseConfig("cache", &cacheConfig)
 
 	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Addr:     fmt.Sprintf("%s:%s", cacheConfig.RedisConfig.Host, cacheConfig.RedisConfig.Port),
+		Password: cacheConfig.RedisConfig.Password,
+		DB:       cacheConfig.RedisConfig.DB,
 	})
 
 	_, err := client.Ping().Result()
 	if err != nil {
-		log.Error(err)
+		log.Error("cache server is not ready: ", err)
 		panic(err)
 	}
 

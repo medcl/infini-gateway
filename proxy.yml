@@ -7,7 +7,7 @@ api:
   network:
     binding: 0.0.0.0:2900
   tls:
-    enabled: false
+    enabled: true
 
 modules:
 - name: web
@@ -28,6 +28,13 @@ elasticsearch:
 
 cache:
   enabled: false
+  redis:
+    host: localhost
+    port: 6379
+    password: ""
+    db: 0
+  #Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+  ttl: 10s
 
 plugins:
 - name: proxy
@@ -47,6 +54,7 @@ plugins:
     max_queue_depth: -1
     timeout: 60s
     elasticsearch: default
+
 
 pipelines:
 - name: primary

@@ -92,13 +92,13 @@ func (handler *API) executeHttpRequest(cfg elastic.ElasticsearchConfig, url, met
 	return util.ExecuteRequest(request)
 }
 
-func getHash(req *http.Request, body []byte) string {
-	return util.MD5digest(fmt.Sprintf("%s-%s", req.URL, string(body)))
+func getHash(keyPrefix string, req *http.Request, body []byte) string {
+	return fmt.Sprintf("%s-%s", keyPrefix, util.MD5digest(fmt.Sprintf("%s-%s", req.URL, string(body))))
 }
 
 func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []byte) {
 
-	hash := getHash(req, body)
+	hash := getHash(handler.cacheConfig.KeyPrefix, req, body)
 
 	if handler.cacheConfig.CacheEnabled {
 		cache, _ := handler.redis.Get(hash).Result()
@@ -142,7 +142,7 @@ func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []
 			w.Write(response.Body)
 
 			if handler.cacheConfig.CacheEnabled {
-				handler.redis.Set(hash, string(response.Body), 10*time.Second).Err()
+				handler.redis.Set(hash, string(response.Body), *handler.cacheConfig.GetTTLDuration()).Err()
 				if global.Env().IsDebug {
 					log.Debug("update cache: ", hash)
 				}
@@ -165,6 +165,10 @@ func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []
 
 			if err != nil {
 				log.Error(err)
+
+				//v.Readable = false
+				//log.Error("upstream: ",v.Name, ", disabled")
+
 				request := model.Request{}
 				request.Url = req.URL.String()
 				request.Upstream = v.Name
@@ -188,7 +192,7 @@ func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []
 			w.Write(response.Body)
 
 			if handler.cacheConfig.CacheEnabled {
-				handler.redis.Set(hash, string(response.Body), 10*time.Second).Err()
+				handler.redis.Set(hash, string(response.Body), *handler.cacheConfig.GetTTLDuration()).Err()
 				if global.Env().IsDebug {
 					log.Debug("update cache: ", hash)
 				}

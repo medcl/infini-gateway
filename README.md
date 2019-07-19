@@ -9,7 +9,7 @@ PROXY, a lightweight elasticsearch proxy written in golang.
 - Support run background as daemon mode(only available on linux and macOS)
 - Auto merge indexing operations to single bulk operation(WIP)
 - Load balancing(indexing and search request), algorithm configurable(WIP)
-- A controllable query cache layer(WIP)
+- A controllable query cache layer, use redis as backend
 - Index throttling or buffering, via disk based indexing queue(limit by queue length or size)
 - Search throttling, limit concurrent connections to upstream(WIP)
 - Builtin stats API and management UI(WIP)

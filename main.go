@@ -29,7 +29,6 @@ import (
 )
 
 func main() {
-
 	terminalHeader := ("___  ____ ____ _  _ _   _\n")
 	terminalHeader += ("|__] |__/ |  |  \\/   \\_/\n")
 	terminalHeader += ("|    |  \\ |__| _/\\_   |\n")
