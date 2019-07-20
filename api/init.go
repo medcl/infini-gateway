@@ -2,7 +2,7 @@ package api
 
 import (
 	log "github.com/cihub/seelog"
-	"github.com/golang/go/src/pkg/fmt"
+	"fmt"
 	"github.com/infinitbyte/framework/core/api"
 	"github.com/infinitbyte/framework/core/env"
 	"src/github.com/go-redis/redis"
