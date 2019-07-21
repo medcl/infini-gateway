@@ -38,6 +38,7 @@ MAC       := "Darwin"
 GO_FILES=$(find . -iname '*.go' | grep -v /vendor/)
 PKGS=$(go list ./... | grep -v /vendor/)
 
+FRAMEWORK_FOLDER := $(CURDIR)/../../infinitbyte/framework/
 FRAMEWORK_BRANCH := master
 FRAMEWORK_VENDOR_FOLDER := $(CURDIR)/vendor/
 FRAMEWORK_VENDOR_BRANCH := master
@@ -120,8 +121,9 @@ clean: clean_data
 
 init:
 	@echo building $(APP_NAME) $(APP_VERSION)
+	@if [ ! -d $(FRAMEWORK_FOLDER) ]; then echo "framework does not exist";(cd ../&&git clone -b $(FRAMEWORK_BRANCH) https://github.com/infinitbyte/framework.git) fi
 	@if [ ! -d $(FRAMEWORK_VENDOR_FOLDER) ]; then echo "framework vendor does not exist";(git clone  -b $(FRAMEWORK_VENDOR_BRANCH) https://github.com/infinitbyte/framework-vendor.git vendor) fi
-	@if [ "" == $(FRAMEWORK_OFFLINE_BUILD) ]; then ($(GO) get github.com/infinitbyte/framework); fi;
+	@if [ "" == $(FRAMEWORK_OFFLINE_BUILD) ]; then (cd $(FRAMEWORK_FOLDER) && git pull origin $(FRAMEWORK_BRANCH)); fi;
 	@if [ "" == $(FRAMEWORK_OFFLINE_BUILD) ]; then (cd vendor && git pull origin $(FRAMEWORK_VENDOR_BRANCH)); fi;
 	@if [ "" == $(FRAMEWORK_OFFLINE_BUILD) ]; then $(GO) get -u github.com/ledongthuc/pdf; fi;
 
