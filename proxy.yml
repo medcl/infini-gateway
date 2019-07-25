@@ -9,19 +9,11 @@ api:
   tls:
     enabled: true
 
-modules:
-- name: web
-  enabled: false
-  tls:
-     enabled: true
-  network:
-     binding: 127.0.0.1:9000
-
 elasticsearch:
 - name: default
   enabled: true
   endpoint: http://localhost:9200
-  index_prefix: proxy-
+#  index_prefix: proxy-
 #  basic_auth:
 #    username: elastic
 #    password: changeme
@@ -44,12 +36,17 @@ plugins:
   upstream:
   - name: primary
     enabled: true
+    cache:
+      enabled: true
+    rate_limit:
+      max_qps: 10000
     queue_name: primary
     max_queue_depth: -1
     timeout: 60s
     elasticsearch: default
   - name: backup
     enabled: false
+    cache_enabled: false
     queue_name: backup
     max_queue_depth: -1
     timeout: 60s
@@ -82,6 +79,13 @@ modules:
   indexer_enabled: true
   store_enabled: true
   orm_enabled: true
+
+- name: web
+  enabled: false
+  tls:
+     enabled: true
+  network:
+     binding: 127.0.0.1:9000
 
 - name: pipeline
   enabled: true

@@ -5,7 +5,7 @@ PROXY, a lightweight elasticsearch proxy written in golang.
 - Auto handling upstream failure while indexing, aka nonstop indexing
 - Auto detect the upstream failure in search
 - Multiple write mechanism, one indexing request map to multi remote elasticsearch clusters
-- Support TLS/HTTPS, generate the certs files automatically
+- Support TLS/HTTPS, generate the cert files automatically
 - Support run background as daemon mode(only available on linux and macOS)
 - Auto merge indexing operations to single bulk operation(WIP)
 - Load balancing(indexing and search request), algorithm configurable(WIP)
@@ -19,21 +19,17 @@ PROXY, a lightweight elasticsearch proxy written in golang.
 - First, setup upstream config in the `proxy.yml`.
 
 ```
+api:
+  enabled: true
+  network:
+    binding: 0.0.0.0:2900
+  tls:
+    enabled: true
+    
 elasticsearch:
 - name: default
   enabled: true
   endpoint: http://localhost:9200
-  index_prefix: proxy-
-  basic_auth:
-    username: elastic
-    password: changeme
-- name: backup
-  enabled: true
-  endpoint: http://localhost:9201
-  index_prefix: proxy-
-  basic_auth:
-    username: elastic
-    password: changeme
 
 plugins:
 - name: proxy
@@ -41,10 +37,12 @@ plugins:
   upstream:
   - name: primary
     enabled: true
+    rate_limit:
+      max_qps: 10000
+    queue_name: primary
+    max_queue_depth: -1
+    timeout: 60s
     elasticsearch: default
-  - name: backup
-    enabled: true
-    elasticsearch: backup
 ```
 - Start the PROXY.
 
@@ -152,10 +150,6 @@ Have fun!
     {"_index":"index","_type":"doc","_id":"1","_version":5,"found":true,"_source":{"a":6}}%
     ```
 
-# UI
-
-http://localhost:9001/admin/
-
 # API
 
 - Status
@@ -177,6 +171,39 @@ curl  -XGET http://localhost:2900/_proxy/requests/?from=0&size=20&upstream=prima
 ```
 curl  -XPOST http://localhost:2900/_proxy/request/redo -d'{"ids":["bb6t4cqaukihf1ag10q0","bb6t4daaukihf1ag10r0"]}'
 ```
+
+# Smoking Benchmark
+
+MacBook Pro (13-inch, 2017, Four Thunderbolt 3 Ports), 3.5 GHz Intel Core i7, 16 GB 2133 MHz LPDDR3
+
+- Https 2900, query
+```
+~$ wrk -c 1000 -d 3m -t 10 -H --latency  https://localhost:2900/index/_search?q=customer:A
+Running 3m test @ https://localhost:2900/index/_search?q=customer:A
+  10 threads and 1000 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    19.13ms    9.07ms 247.10ms   75.79%
+    Req/Sec     2.63k   699.58    10.55k    61.93%
+  4707681 requests in 3.00m, 1.89GB read
+  Socket errors: connect 417, read 290, write 0, timeout 0
+Requests/sec:  26140.53
+Transfer/sec:     10.72MB
+```
+
+- Https 2900, query with cache
+```
+~$ wrk -c 1000 -d 3m -t 10 -H --latency  https://localhost:2900/index/_search?q=customer:A
+Running 3m test @ https://localhost:2900/index/_search?q=customer:A
+  10 threads and 1000 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     7.59ms    8.47ms 338.09ms   87.25%
+    Req/Sec     6.88k     3.08k   38.47k    78.65%
+  12275137 requests in 3.00m, 4.90GB read
+  Socket errors: connect 387, read 676, write 0, timeout 0
+Requests/sec:  68158.61
+Transfer/sec:     27.84MB
+```
+
 
 License
 =======

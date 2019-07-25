@@ -81,4 +81,5 @@ type StaticFS struct {
 	CheckLocalFirst bool
 }
 
-var data = map[string]*vfs.VFile{}
+var data = map[string]*vfs.VFile{
+}
