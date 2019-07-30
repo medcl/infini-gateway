@@ -38,7 +38,7 @@ MAC       := "Darwin"
 GO_FILES=$(find . -iname '*.go' | grep -v /vendor/)
 PKGS=$(go list ./... | grep -v /vendor/)
 
-FRAMEWORK_FOLDER := $(CURDIR)/../../infinitbyte/framework/
+FRAMEWORK_FOLDER := $(CURDIR)/../framework/
 FRAMEWORK_BRANCH := master
 FRAMEWORK_VENDOR_FOLDER := $(CURDIR)/vendor/
 FRAMEWORK_VENDOR_BRANCH := master
