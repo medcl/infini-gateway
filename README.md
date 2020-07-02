@@ -204,6 +204,16 @@ Requests/sec:  68158.61
 Transfer/sec:     27.84MB
 ```
 
+# Build
+
+```
+mkdir ~/go/src/infini.sh/ -p
+cd  ~/go/src/infini.sh/
+git clone https://github.com/medcl/elasticsearch-proxy.git proxy
+cd proxy
+make
+```
+
 
 License
 =======
