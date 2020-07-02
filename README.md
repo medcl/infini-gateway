@@ -25,7 +25,7 @@ api:
     binding: 0.0.0.0:2900
   tls:
     enabled: true
-    
+
 elasticsearch:
 - name: default
   enabled: true
@@ -216,7 +216,30 @@ make
 Note: Path matters, please make sure follow exactly the above steps.
 
 
+# Docker
+
+The docker images size is only 6.1 MB.
+
+Pull it from official docker hub
+```
+docker pull medcl/elasticsearch-proxy:latest
+```
+
+Or build your own image locally
+```
+docker build -t medcl/elasticsearch-proxy:latest -f docker/Dockerfile .
+```
+
+Customize your `proxy.yml`, place somewhere, eg: `/tmp/proxy.yml`
+```
+```
+
+Rock your proxy!
+```
+docker run --publish 2900:2900  -v /tmp/proxy.yml:/proxy.yml medcl/elasticsearch-proxy:latest
+```
+
+
 License
 =======
-Released under the [Apache License, Version 2.0](https://infini.sh/LICENSE) .
-
+Released under the [Apache License, Version 2.0](https://infini.sh/LICENSE).
