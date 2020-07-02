@@ -218,7 +218,7 @@ Note: Path matters, please make sure follow exactly the above steps.
 
 # Docker
 
-The docker images size is only 6.1 MB.
+The docker image size is only 8.7 MB.
 
 Pull it from official docker hub
 ```

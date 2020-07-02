@@ -84,10 +84,15 @@ func InitAPI() {
 		RedisConfig: RedisConfig{Host: "localhost", Port: "6379", Password: "", DB: 0},
 	}
 
+
+
 	env.ParseConfig("cache", &cacheConfig)
 
 	cacheHandler := CacheHandler{config: &cacheConfig}
-	cacheHandler.Init()
+
+	if cacheConfig.CacheEnabled{
+		cacheHandler.Init()
+	}
 
 	apis := API{cacheHandler: &cacheHandler, cacheConfig: cacheConfig}
 
