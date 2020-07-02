@@ -213,6 +213,7 @@ git clone https://github.com/medcl/elasticsearch-proxy.git proxy
 cd proxy
 make
 ```
+Note: Path matters, please make sure follow exactly the above steps.
 
 
 License
