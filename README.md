@@ -232,6 +232,16 @@ docker build -t medcl/elasticsearch-proxy:latest -f docker/Dockerfile .
 
 Customize your `proxy.yml`, place somewhere, eg: `/tmp/proxy.yml`
 ```
+...
+elasticsearch:
+- name: default
+  enabled: true
+  endpoint: http://192.168.3.123:9200
+  index_prefix: proxy-
+  basic_auth:
+    username: elastic
+    password: changeme
+...
 ```
 
 Rock your proxy!
