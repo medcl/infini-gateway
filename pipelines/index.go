@@ -3,15 +3,15 @@ package pipelines
 import (
 	"fmt"
 	log "github.com/cihub/seelog"
-	"github.com/infinitbyte/framework/core/elastic"
-	"github.com/infinitbyte/framework/core/errors"
-	"github.com/infinitbyte/framework/core/filter"
-	"github.com/infinitbyte/framework/core/global"
-	"github.com/infinitbyte/framework/core/pipeline"
-	"github.com/infinitbyte/framework/core/queue"
-	"github.com/infinitbyte/framework/core/util"
-	"github.com/medcl/elasticsearch-proxy/config"
-	"github.com/medcl/elasticsearch-proxy/model"
+	"infini.sh/framework/core/elastic"
+	"infini.sh/framework/core/errors"
+	"infini.sh/framework/core/filter"
+	"infini.sh/framework/core/global"
+	"infini.sh/framework/core/pipeline"
+	"infini.sh/framework/core/queue"
+	"infini.sh/framework/core/util"
+	"infini.sh/proxy/config"
+	"infini.sh/proxy/model"
 )
 
 type IndexJoint struct {

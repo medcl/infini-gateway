@@ -1,9 +1,9 @@
 package pipelines
 
 import (
-	"github.com/infinitbyte/framework/core/pipeline"
-	"github.com/medcl/elasticsearch-proxy/config"
-	"github.com/medcl/elasticsearch-proxy/model"
+	"infini.sh/framework/core/pipeline"
+	"infini.sh/proxy/config"
+	"infini.sh/proxy/model"
 )
 
 type LoggingJoint struct {

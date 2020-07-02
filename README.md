@@ -207,5 +207,5 @@ Transfer/sec:     27.84MB
 
 License
 =======
-Released under the [Apache License, Version 2.0](https://github.com/medcl/elasticsearch-proxy/blob/master/LICENSE) .
+Released under the [Apache License, Version 2.0](https://infini.sh/LICENSE) .
 

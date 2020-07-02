@@ -1,5 +1,0 @@
-package ui
-
-func InitUI() {
-
-}

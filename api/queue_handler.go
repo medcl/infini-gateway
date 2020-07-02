@@ -1,9 +1,9 @@
 package api
 
 import (
-	"github.com/infinitbyte/framework/core/api/router"
-	"github.com/infinitbyte/framework/core/queue"
-	"github.com/infinitbyte/framework/core/util"
+	"infini.sh/framework/core/api/router"
+	"infini.sh/framework/core/queue"
+	"infini.sh/framework/core/util"
 	"net/http"
 )
 

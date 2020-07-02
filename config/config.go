@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/infinitbyte/framework/core/pipeline"
+	"infini.sh/framework/core/pipeline"
 	"sync"
 )
 

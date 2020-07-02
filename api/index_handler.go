@@ -3,15 +3,15 @@ package api
 import (
 	"fmt"
 	log "github.com/cihub/seelog"
-	"github.com/infinitbyte/framework/core/api/router"
-	"github.com/infinitbyte/framework/core/elastic"
-	"github.com/infinitbyte/framework/core/env"
-	"github.com/infinitbyte/framework/core/global"
-	"github.com/infinitbyte/framework/core/pipeline"
-	"github.com/infinitbyte/framework/core/queue"
-	"github.com/infinitbyte/framework/core/util"
-	"github.com/medcl/elasticsearch-proxy/config"
-	"github.com/medcl/elasticsearch-proxy/model"
+	"infini.sh/framework/core/api/router"
+	"infini.sh/framework/core/elastic"
+	"infini.sh/framework/core/env"
+	"infini.sh/framework/core/global"
+	"infini.sh/framework/core/pipeline"
+	"infini.sh/framework/core/queue"
+	"infini.sh/framework/core/util"
+	"infini.sh/proxy/config"
+	"infini.sh/proxy/model"
 	"net/http"
 	"strconv"
 	"strings"
@@ -20,6 +20,7 @@ import (
 
 // IndexAction returns cluster health information
 func (handler *API) IndexAction(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	log.Debug("index action")
 
 	upstream := handler.GetHeader(req, "UPSTREAM", "auto")
 	if upstream != "auto" {
@@ -104,14 +105,14 @@ func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []
 
 		hash = getHash(handler.cacheConfig.KeyPrefix, req, body)
 
-		cache, _ := handler.redis.Get(hash).Result()
-		if cache != "" {
+		cache, err := handler.cacheHandler.Get(hash)
+		if len(cache) > 0 && err == nil {
 			if global.Env().IsDebug {
 				log.Trace("hit cache: ", req.URL, ",", cache)
 			}
 			w.Header().Add("upstream", "cache")
 			w.WriteHeader(200)
-			w.Write([]byte(cache))
+			w.Write(cache)
 			return
 		}
 	}
@@ -145,7 +146,7 @@ func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []
 			w.Write(response.Body)
 
 			if handler.cacheConfig.CacheEnabled {
-				handler.redis.Set(hash, string(response.Body), *handler.cacheConfig.GetTTLDuration()).Err()
+				handler.cacheHandler.Set(hash, response.Body, handler.cacheConfig.GetTTLMilliseconds())
 				if global.Env().IsDebug {
 					log.Debug("update cache: ", hash)
 				}
@@ -195,7 +196,7 @@ func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []
 			w.Write(response.Body)
 
 			if handler.cacheConfig.CacheEnabled {
-				handler.redis.Set(hash, string(response.Body), *handler.cacheConfig.GetTTLDuration()).Err()
+				handler.cacheHandler.Set(hash, response.Body, handler.cacheConfig.GetTTLMilliseconds())
 				if global.Env().IsDebug {
 					log.Debug("update cache: ", hash)
 				}

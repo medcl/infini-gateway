@@ -18,14 +18,14 @@ package main
 
 import (
 	_ "expvar"
-	"github.com/infinitbyte/framework"
-	"github.com/infinitbyte/framework/core/module"
-	"github.com/infinitbyte/framework/core/orm"
-	"github.com/infinitbyte/framework/core/util"
-	"github.com/infinitbyte/framework/modules"
-	"github.com/medcl/elasticsearch-proxy/config"
-	"github.com/medcl/elasticsearch-proxy/model"
-	"github.com/medcl/elasticsearch-proxy/plugin"
+	"infini.sh/framework"
+	"infini.sh/framework/core/module"
+	"infini.sh/framework/core/orm"
+	"infini.sh/framework/core/util"
+	"infini.sh/framework/modules"
+	"infini.sh/proxy/config"
+	"infini.sh/proxy/model"
+	"infini.sh/proxy/plugin"
 )
 
 func main() {

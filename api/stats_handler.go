@@ -1,8 +1,8 @@
 package api
 
 import (
-	"github.com/infinitbyte/framework/core/api/router"
-	"github.com/infinitbyte/framework/core/stats"
+	"infini.sh/framework/core/api/router"
+	"infini.sh/framework/core/stats"
 	"net/http"
 )
 

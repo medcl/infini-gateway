@@ -1,12 +1,11 @@
 package plugin
 
 import (
-	. "github.com/infinitbyte/framework/core/config"
-	"github.com/infinitbyte/framework/core/pipeline"
-	"github.com/medcl/elasticsearch-proxy/api"
-	"github.com/medcl/elasticsearch-proxy/config"
-	"github.com/medcl/elasticsearch-proxy/pipelines"
-	"github.com/medcl/elasticsearch-proxy/ui"
+	. "infini.sh/framework/core/config"
+	"infini.sh/framework/core/pipeline"
+	"infini.sh/proxy/api"
+	"infini.sh/proxy/config"
+	"infini.sh/proxy/pipelines"
 )
 
 type ProxyPlugin struct {
@@ -43,7 +42,6 @@ func (module ProxyPlugin) Start() error {
 
 	//register UI
 	if proxyConfig.UIEnabled {
-		ui.InitUI()
 	}
 
 	return nil

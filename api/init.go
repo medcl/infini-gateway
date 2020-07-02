@@ -1,19 +1,48 @@
 package api
 
 import (
-	log "github.com/cihub/seelog"
 	"fmt"
-	"github.com/infinitbyte/framework/core/api"
-	"github.com/infinitbyte/framework/core/env"
-	"src/github.com/go-redis/redis"
+	log "github.com/cihub/seelog"
+	"github.com/go-redis/redis"
+	"infini.sh/framework/core/api"
+	"infini.sh/framework/core/env"
 	"time"
 )
 
 // API namespace
 type API struct {
 	api.Handler
-	redis       *redis.Client
-	cacheConfig CacheConfig
+	cacheHandler *CacheHandler
+	cacheConfig  CacheConfig
+}
+
+type CacheHandler struct {
+	config *CacheConfig
+	client *redis.Client
+}
+
+func (handler CacheHandler) Init() {
+
+	client := redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%s", handler.config.RedisConfig.Host, handler.config.RedisConfig.Port),
+		Password: handler.config.RedisConfig.Password,
+		DB:       handler.config.RedisConfig.DB,
+	})
+
+	_, err := client.Ping().Result()
+	if err != nil {
+		log.Error("cache server is not ready: ", err)
+		panic(err)
+	}
+}
+
+func (handler CacheHandler) Get(key string) ([]byte, error) {
+
+	return nil, nil
+}
+
+func (handler CacheHandler) Set(string, []byte, int64) (bool, error) {
+	return false, nil
 }
 
 type RedisConfig struct {
@@ -27,12 +56,12 @@ type CacheConfig struct {
 	CacheEnabled bool   `config:"enabled"`
 	KeyPrefix    string `config:"key_prefix"`
 	TTL          string `config:"ttl"`
-	duration     *time.Duration
+	duration     int64
 	RedisConfig  RedisConfig `config:"redis"`
 }
 
-func (config CacheConfig) GetTTLDuration() *time.Duration {
-	if config.duration != nil {
+func (config CacheConfig) GetTTLMilliseconds() int64 {
+	if config.duration > 0 {
 		return config.duration
 	}
 
@@ -41,7 +70,7 @@ func (config CacheConfig) GetTTLDuration() *time.Duration {
 		if err != nil {
 			dur, _ = time.ParseDuration("10s")
 		}
-		config.duration = &dur
+		config.duration = dur.Milliseconds()
 	}
 	return config.duration
 }
@@ -56,19 +85,10 @@ func InitAPI() {
 
 	env.ParseConfig("cache", &cacheConfig)
 
-	client := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%s", cacheConfig.RedisConfig.Host, cacheConfig.RedisConfig.Port),
-		Password: cacheConfig.RedisConfig.Password,
-		DB:       cacheConfig.RedisConfig.DB,
-	})
+	cacheHandler := CacheHandler{config: &cacheConfig}
+	cacheHandler.Init()
 
-	_, err := client.Ping().Result()
-	if err != nil {
-		log.Error("cache server is not ready: ", err)
-		panic(err)
-	}
-
-	apis := API{redis: client, cacheConfig: cacheConfig}
+	apis := API{cacheHandler: &cacheHandler, cacheConfig: cacheConfig}
 
 	//Index
 	api.HandleAPIMethod(api.HEAD, "/", apis.IndexAction)

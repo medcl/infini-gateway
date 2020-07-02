@@ -18,9 +18,9 @@ package model
 
 import (
 	log "github.com/cihub/seelog"
-	"github.com/infinitbyte/framework/core/errors"
-	"github.com/infinitbyte/framework/core/orm"
-	"github.com/infinitbyte/framework/core/util"
+	"infini.sh/framework/core/errors"
+	"infini.sh/framework/core/orm"
+	"infini.sh/framework/core/util"
 	"time"
 )
 

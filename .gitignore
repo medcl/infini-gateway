@@ -46,4 +46,4 @@ bin/
 /leveldb
 /dist
 vendor
-
+.git
