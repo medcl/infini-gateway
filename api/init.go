@@ -80,6 +80,7 @@ func InitAPI() {
 
 	cacheConfig := CacheConfig{
 		KeyPrefix:   "proxy_",
+		CacheEnabled: false,
 		RedisConfig: RedisConfig{Host: "localhost", Port: "6379", Password: "", DB: 0},
 	}
 

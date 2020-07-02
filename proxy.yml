@@ -19,7 +19,7 @@ elasticsearch:
 #    password: changeme
 
 cache:
-  enabled: true
+  enabled: false
   redis:
     host: localhost
     port: 6379
