@@ -2,7 +2,7 @@ SHELL=/bin/bash
 
 # APP info
 APP_NAME := proxy
-APP_VERSION := 0.2.0_SNAPSHOT
+APP_VERSION := 1.0.0_SNAPSHOT
 APP_CONFIG := $(APP_NAME).yml
 APP_STATIC_FOLDER := static
 APP_UI_FOLDER := ui
@@ -27,8 +27,8 @@ CURDIR := $(shell pwd)
 OLDGOPATH:= $(GOPATH)
 NEWGOPATH:= $(CURDIR):$(CURDIR)/vendor:$(GOPATH)
 
-GO        := GO15VENDOREXPERIMENT="1" go
-GOBUILD  := GOPATH=$(NEWGOPATH) CGO_ENABLED=1  $(GO) build -ldflags -s -gcflags "-m -m"
+GO        := GO15VENDOREXPERIMENT="1" GO111MODULE=off go
+GOBUILD  := GOPATH=$(NEWGOPATH) CGO_ENABLED=1  $(GO) build -ldflags='-s -w' -gcflags "-m"  --work
 GOBUILDNCGO  := GOPATH=$(NEWGOPATH) CGO_ENABLED=0  $(GO) build -ldflags -s
 GOTEST   := GOPATH=$(NEWGOPATH) CGO_ENABLED=1  $(GO) test -ldflags -s
 
@@ -38,9 +38,12 @@ MAC       := "Darwin"
 GO_FILES=$(find . -iname '*.go' | grep -v /vendor/)
 PKGS=$(go list ./... | grep -v /vendor/)
 
-FRAMEWORK_FOLDER := $(CURDIR)/../../infinitbyte/framework/
+INFINI_BASE_FOLDER := $(GOPATH)/src/infini.sh/
+FRAMEWORK_FOLDER := $(INFINI_BASE_FOLDER)/framework/
+FRAMEWORK_REPO := https://github.com/medcl/framework.git
 FRAMEWORK_BRANCH := master
 FRAMEWORK_VENDOR_FOLDER := $(CURDIR)/vendor/
+FRAMEWORK_VENDOR＿REPO :=  https://github.com/medcl/framework-vendor.git
 FRAMEWORK_VENDOR_BRANCH := master
 
 FRAMEWORK_OFFLINE_BUILD := ""
@@ -59,9 +62,6 @@ build: config
 	@$(MAKE) restore-generated-file
 
 build-cmd: config
-	cd cmd/backup && GOOS=darwin GOARCH=amd64 $(GOBUILDNCGO) -o ../../bin/backup-darwin
-	cd cmd/backup && GOOS=linux  GOARCH=amd64 $(GOBUILDNCGO) -o ../../bin/backup-linux64
-	cd cmd/backup && GOOS=windows GOARCH=amd64 $(GOBUILDNCGO) -o ../../bin/backup-windows64.exe
 	@$(MAKE) restore-generated-file
 
 # used to build the binary for gdb debugging
@@ -121,11 +121,12 @@ clean: clean_data
 
 init:
 	@echo building $(APP_NAME) $(APP_VERSION)
-	@if [ ! -d $(FRAMEWORK_FOLDER) ]; then echo "framework does not exist";(cd ../&&git clone -b $(FRAMEWORK_BRANCH) https://github.com/infinitbyte/framework.git) fi
-	@if [ ! -d $(FRAMEWORK_VENDOR_FOLDER) ]; then echo "framework vendor does not exist";(git clone  -b $(FRAMEWORK_VENDOR_BRANCH) https://github.com/infinitbyte/framework-vendor.git vendor) fi
+	@echo $(CURDIR)
+	@mkdir -p $(INFINI_BASE_FOLDER)
+	@if [ ! -d $(FRAMEWORK_FOLDER) ]; then echo "framework does not exist";(cd $(INFINI_BASE_FOLDER)&&git clone -b $(FRAMEWORK_BRANCH) $(FRAMEWORK_REPO) ) fi
+	@if [ ! -d $(FRAMEWORK_VENDOR_FOLDER) ]; then echo "framework vendor does not exist";(git clone  -b $(FRAMEWORK_VENDOR_BRANCH) $(FRAMEWORK_VENDOR＿REPO) vendor) fi
 	@if [ "" == $(FRAMEWORK_OFFLINE_BUILD) ]; then (cd $(FRAMEWORK_FOLDER) && git pull origin $(FRAMEWORK_BRANCH)); fi;
 	@if [ "" == $(FRAMEWORK_OFFLINE_BUILD) ]; then (cd vendor && git pull origin $(FRAMEWORK_VENDOR_BRANCH)); fi;
-
 
 update-generated-file:
 	@echo "update generated info"
@@ -140,14 +141,10 @@ restore-generated-file:
 
 
 update-vfs:
-	@if [ -d $(APP_STATIC_FOLDER) ]; then  echo "generate static files";$(GO) get github.com/infinitbyte/framework/cmd/vfs;(cd $(APP_STATIC_FOLDER) && vfs -ignore="static.go|.DS_Store" -o static.go -pkg static . ) fi
+	cd $(FRAMEWORK_FOLDER) && cd cmd/vfs && $(GO) build && cp vfs ~/
+	@if [ -d $(APP_STATIC_FOLDER) ]; then  echo "generate static files";(cd $(APP_STATIC_FOLDER) && ~/vfs -ignore="static.go|.DS_Store" -o static.go -pkg public . ) fi
 
-update-template-ui:
-	@if [ -d $(APP_UI_FOLDER) ]; then  (echo "generate main UI pages";$(GO) get github.com/infinitbyte/ego/cmd/ego;cd $(APP_UI_FOLDER)/ && ego) fi
-	@if [ -d $(APP_PLUGIN_FOLDER) ]; then  (echo "generate plugin UI pages";$(GO) get github.com/infinitbyte/ego/cmd/ego;cd $(APP_PLUGIN_FOLDER)/ && ego) fi
-
-#config: init update-vfs update-template-ui
-config: init update-vfs update-template-ui update-generated-file
+config: init update-vfs update-generated-file
 	@echo "update configs"
 	@# $(GO) env
 	@mkdir -p bin
@@ -196,32 +193,6 @@ test:
 	go get -u github.com/kardianos/govendor
 	go get github.com/stretchr/testify/assert
 	govendor test +local
-	#$(GO) test -timeout 60s ./... --ignore ./vendor
+	go test -timeout 60s ./...
 	#GORACE="halt_on_error=1" go test ./... -race -timeout 120s  --ignore ./vendor
 	#go test -bench=. -benchmem
-
-check:
-	$(GO)  get github.com/golang/lint/golint
-	$(GO)  get honnef.co/go/tools/cmd/megacheck
-	test -z $(gofmt -s -l $GO_FILES)    # Fail if a .go file hasn't been formatted with gofmt
-	$(GO) test -v -race $(PKGS)            # Run all the tests with the race detector enabled
-	$(GO) vet $(PKGS)                      # go vet is the official Go static analyzer
-	@echo "go tool vet"
-	go tool vet main.go
-	go tool vet core
-	go tool vet modules
-	megacheck $(PKGS)                      # "go vet on steroids" + linter
-	golint -set_exit_status $(PKGS)    # one last linter
-
-errcheck:
-	go get github.com/kisielk/errcheck
-	errcheck -blank $(PKGS)
-
-cover:
-	go get github.com/mattn/goveralls
-	go test -v -cover -race -coverprofile=data/coverage.out
-	goveralls -coverprofile=data/coverage.out -service=travis-ci -repotoken=$COVERALLS_TOKEN
-
-cyclo:
-	go get -u github.com/fzipp/gocyclo
-	gocyclo -top 10 -over 12 $$(ls -d */ | grep -v vendor)
