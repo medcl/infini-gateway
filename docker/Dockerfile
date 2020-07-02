@@ -9,7 +9,6 @@ RUN mkdir -p /go/src/infini.sh
 
 WORKDIR /go/src/infini.sh/
 COPY ./ /go/src/infini.sh/proxy
-COPY ./docker/entrypoint.sh /
 
 RUN cd proxy && make build
 
