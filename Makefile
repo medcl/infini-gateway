@@ -40,10 +40,10 @@ PKGS=$(go list ./... | grep -v /vendor/)
 
 INFINI_BASE_FOLDER := $(GOPATH)/src/infini.sh/
 FRAMEWORK_FOLDER := $(INFINI_BASE_FOLDER)/framework/
-FRAMEWORK_REPO := https://github.com/medcl/framework.git
+FRAMEWORK_REPO := https://github.com/medcl/infini-framework.git
 FRAMEWORK_BRANCH := master
 FRAMEWORK_VENDOR_FOLDER := $(CURDIR)/vendor/
-FRAMEWORK_VENDOR＿REPO :=  https://github.com/medcl/framework-vendor.git
+FRAMEWORK_VENDOR＿REPO :=  https://github.com/medcl/infini-framework-vendor.git
 FRAMEWORK_VENDOR_BRANCH := master
 
 FRAMEWORK_OFFLINE_BUILD := ""
