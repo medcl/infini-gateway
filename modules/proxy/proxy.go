@@ -1,4 +1,4 @@
-package plugin
+package proxy
 
 import (
 	. "infini.sh/framework/core/config"

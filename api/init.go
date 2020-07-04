@@ -37,7 +37,6 @@ func (handler CacheHandler) Init() {
 }
 
 func (handler CacheHandler) Get(key string) ([]byte, error) {
-
 	return nil, nil
 }
 

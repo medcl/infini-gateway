@@ -25,8 +25,8 @@ import (
 	"infini.sh/framework/modules"
 	"infini.sh/proxy/config"
 	"infini.sh/proxy/model"
-	"infini.sh/proxy/plugin"
-	"infini.sh/proxy/ha"
+	"infini.sh/proxy/modules/proxy"
+	"infini.sh/proxy/modules/floating_ip"
 )
 
 func main() {
@@ -47,12 +47,12 @@ func main() {
 	defer app.Shutdown()
 
 	app.Start(func() {
-        ha.SetupVIP()
 
 		//load core modules first
 		modules.Register()
 
-		module.RegisterUserPlugin(plugin.ProxyPlugin{})
+		module.RegisterUserPlugin(proxy.ProxyPlugin{})
+		module.RegisterUserPlugin(floating_ip.FloatingIPPlugin{})
 
 		//start each module, with enabled provider
 		module.Start()
