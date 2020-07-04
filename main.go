@@ -26,6 +26,7 @@ import (
 	"infini.sh/proxy/config"
 	"infini.sh/proxy/model"
 	"infini.sh/proxy/plugin"
+	"infini.sh/proxy/ha"
 )
 
 func main() {
@@ -46,6 +47,7 @@ func main() {
 	defer app.Shutdown()
 
 	app.Start(func() {
+        ha.SetupVIP()
 
 		//load core modules first
 		modules.Register()
