@@ -206,6 +206,8 @@ Transfer/sec:     27.84MB
 
 # Build
 
+go1.14+
+
 ```
 mkdir ~/go/src/infini.sh/ -p
 cd  ~/go/src/infini.sh/
@@ -232,7 +234,7 @@ docker build -t medcl/elasticsearch-proxy:latest -f docker/Dockerfile .
 
 Customize your `proxy.yml`, place somewhere, eg: `/tmp/proxy.yml`
 ```
-...
+tee /tmp/proxy.yml <<-'EOF'
 elasticsearch:
 - name: default
   enabled: true
@@ -241,14 +243,13 @@ elasticsearch:
   basic_auth:
     username: elastic
     password: changeme
-...
+EOF
 ```
 
-Rock your proxy!
+Rock with your proxy!
 ```
 docker run --publish 2900:2900  -v /tmp/proxy.yml:/proxy.yml medcl/elasticsearch-proxy:latest
 ```
-
 
 License
 =======
