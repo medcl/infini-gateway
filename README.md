@@ -56,14 +56,14 @@ ___  ____ ____ _  _ _   _
 0.1.0_SNAPSHOT,  430bd60, Sun Apr 8 09:44:38 2018 +0800, medcl, seems good to go
 
 [04-05 19:30:13] [INF] [instance.go:23] workspace: data/APP/nodes/0
-[04-05 19:30:13] [INF] [api.go:147] api server listen at: http://0.0.0.0:2900
+[04-05 19:30:13] [INF] [api.go:147] api server listen at: https://0.0.0.0:2900
 
 ```
 
 - Done! Now you are ready to rock with it.
 
 ```
-➜ curl  -XGET http://localhost:2900/
+➜ curl -k -XGET https://localhost:2900/
 {
   "name": "PROXY",
   "tagline": "You Know, for Proxy",
@@ -78,7 +78,7 @@ ___  ____ ____ _  _ _   _
     "number": "0.1.0_SNAPSHOT"
   }
 }
-➜ curl  -XGET -H'UPSTREAM:primary'  http://localhost:2900/
+➜ curl -k -XGET -H'UPSTREAM:primary'  https://localhost:2900/
 {
   "name" : "XZDZ8qc",
   "cluster_name" : "my-application",
@@ -94,7 +94,7 @@ ___  ____ ____ _  _ _   _
   },
   "tagline" : "You Know, for Search"
 }
-➜ curl  -XGET -H'UPSTREAM:backup'  http://localhost:2900/
+➜ curl -k -XGET -H'UPSTREAM:backup'  https://localhost:2900/
 {
   "name" : "zRcp1My",
   "cluster_name" : "elasticsearch",
@@ -108,18 +108,20 @@ ___  ____ ____ _  _ _   _
   },
   "tagline" : "You Know, for Search"
 }
-➜ curl  -XPOST http://localhost:2900/myindex/doc/1 -d'{"msg":"hello world!"}'
+➜ curl -k -XPOST https://localhost:2900/myindex/_doc/1 -d'{"msg":"hello world!"}'
 { "acknowledge": true }
-➜ curl  -XGET http://localhost:2900/myindex/doc/1
-{"_index":"myindex","_type":"doc","_id":"1","_version":1,"found":true,"_source":{"msg":"hello world!"}}
-➜ curl  -XPUT http://localhost:2900/myindex/doc/1 -d'{"msg":"i am a proxy!"}'
+➜ curl -k -XGET https://localhost:2900/myindex/_doc/1
+{"_index":"myindex","_type":"_doc","_id":"1","_version":1,"found":true,"_source":{"msg":"hello world!"}}
+➜ curl -k -XPUT https://localhost:2900/myindex/_doc/1 -d'{"msg":"i am a proxy!"}'
 { "acknowledge": true }
-➜ curl  -XGET http://localhost:2900/myindex/doc/1
-{"_index":"myindex","_type":"doc","_id":"1","_version":2,"found":true,"_source":{"msg":"i am a proxy!"}}
-➜ curl  -XDELETE http://localhost:2900/myindex/doc/1
+➜ curl -k -XGET https://localhost:2900/myindex/_doc/1
+{"_index":"myindex","_type":"_doc","_id":"1","_version":2,"found":true,"_source":{"msg":"i am a proxy!"}}
+➜ curl -k -XGET https://localhost:2900/myindex/_search?q=proxy
+{"took":171,"timed_out":false,"_shards":{"total":1,"successful":1,"skipped":0,"failed":0},"hits":{"total":{"value":1,"relation":"eq"},"max_score":0.8547784,"hits":[{"_index":"myindex","_type":"_doc","_id":"1","_score":0.8547784,"_source":{"msg":"i am a proxy!"}}]}}
+➜ curl -k -XDELETE https://localhost:2900/myindex/_doc/1
 { "acknowledge": true }
-➜ curl  -XGET http://localhost:2900/myindex/doc/1
-{"_index":"myindex","_type":"doc","_id":"1","found":false}
+➜ curl -k -XGET https://localhost:2900/myindex/_doc/1
+{"_index":"myindex","_type":"_doc","_id":"1","found":false}
 ```
 
 Have fun!
@@ -130,12 +132,12 @@ Have fun!
   1. `UPSTREAM`, manually choose which upstream are going to query against(read/search requests)
 
     ```
-    ➜ curl -v -XGET -H'UPSTREAM:primary'  http://localhost:2900/index/doc/1
+    ➜ curl -v -XGET -H'UPSTREAM:primary'  https://localhost:2900/index/_doc/1
     Note: Unnecessary use of -X or --request, GET is already inferred.
     *   Trying 127.0.0.1...
     * TCP_NODELAY set
     * Connected to localhost (127.0.0.1) port 2900 (#0)
-    > GET /index/doc/1 HTTP/1.1
+    > GET /index/_doc/1 HTTP/1.1
     > Host: localhost:2900
     > User-Agent: curl/7.54.0
     > Accept: */*
@@ -148,7 +150,7 @@ Have fun!
     < Content-Type: text/plain; charset=utf-8
     <
     * Connection #0 to host localhost left intact
-    {"_index":"index","_type":"doc","_id":"1","_version":5,"found":true,"_source":{"a":6}}%
+    {"_index":"index","_type":"_doc","_id":"1","_version":5,"found":true,"_source":{"a":6}}%
     ```
 
 # Floating IP
@@ -163,28 +165,28 @@ plugins:
   interface: en0
   priority: 100
 ```
-Note: Floating IP feature may not support on docker/container platform.
+Note: Floating IP feature may not support on docker/container platform, and should not deploy multi proxy instances on single host.
 
 # API
 
 - Status
 ```
-curl -XGET localhost:2900/_proxy/stats
+curl -k -XGET https://localhost:2900/_proxy/stats
 ```
 ```
-curl -XGET localhost:2900/_proxy/queue/stats
+curl -k -XGET https://localhost:2900/_proxy/queue/stats
 ```
 - Resume Queue
 ```
-curl -XPOST http://localhost:2900/_proxy/queue/resume -d'{"queue":"primary"}'
+curl -k -XPOST https://localhost:2900/_proxy/queue/resume -d'{"queue":"primary"}'
 ```
 - Get Error requests
 ```
-curl  -XGET http://localhost:2900/_proxy/requests/?from=0&size=20&upstream=primary&status=1
+curl -k -XGET https://localhost:2900/_proxy/requests/?from=0&size=20&upstream=primary&status=1
 ```
 - Replay Error log
 ```
-curl  -XPOST http://localhost:2900/_proxy/request/redo -d'{"ids":["bb6t4cqaukihf1ag10q0","bb6t4daaukihf1ag10r0"]}'
+curl -k -XPOST https://localhost:2900/_proxy/request/redo -d'{"ids":["bb6t4cqaukihf1ag10q0","bb6t4daaukihf1ag10r0"]}'
 ```
 
 # Smoking Benchmark
