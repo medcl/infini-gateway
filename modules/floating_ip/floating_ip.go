@@ -17,7 +17,10 @@ limitations under the License.
 package floating_ip
 
 import (
+	log "github.com/cihub/seelog"
+	"infini.sh/framework/core/api"
 	"infini.sh/framework/core/config"
+	"infini.sh/framework/core/env"
 	"infini.sh/framework/core/net"
 )
 
@@ -38,8 +41,8 @@ func (this FloatingIPPlugin) Name() string {
 
 var (
 	floatingIPConfig = FloatingIPConfig{
-		Enabled: false,
-		Netmask: "255.255.255.0",
+		Enabled:  false,
+		Netmask:  "255.255.255.0",
 		Priority: 1,
 	}
 )
@@ -49,16 +52,19 @@ func (module FloatingIPPlugin) Setup(cfg *config.Config) {
 }
 
 func (module FloatingIPPlugin) Start() error {
-
-	err:=net.SetupAlias(floatingIPConfig.Interface,floatingIPConfig.IP,floatingIPConfig.Netmask)
-	if err!=nil {
+	log.Info("setup floating IP, root privilege are required")
+	err := net.SetupAlias(floatingIPConfig.Interface, floatingIPConfig.IP, floatingIPConfig.Netmask)
+	if err != nil {
 		panic(err)
 	}
 
+	apiConfig := &api.APIConfig{}
+	env.ParseConfig("api", apiConfig)
+	log.Infof("high availability address: %s://%s:%s", apiConfig.GetSchema(), floatingIPConfig.IP, apiConfig.NetworkConfig.GetBindingPort())
 	return nil
 }
 
 func (module FloatingIPPlugin) Stop() error {
-	net.DisableAlias(floatingIPConfig.Interface,floatingIPConfig.IP,floatingIPConfig.Netmask)
+	net.DisableAlias(floatingIPConfig.Interface, floatingIPConfig.IP, floatingIPConfig.Netmask)
 	return nil
 }
