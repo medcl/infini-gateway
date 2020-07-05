@@ -24,9 +24,7 @@ func (joint IndexJoint) Name() string {
 func (joint IndexJoint) Process(c *pipeline.Context) error {
 
 	upstream := c.MustGetString(config.Upstream)
-
 	cfg := config.GetUpstreamConfig(upstream)
-
 	esConfig := elastic.GetConfig(cfg.Elasticsearch)
 
 	url := fmt.Sprintf("%s%s", esConfig.Endpoint, c.MustGetString(config.Url))

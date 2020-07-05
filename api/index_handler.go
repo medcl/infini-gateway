@@ -20,6 +20,7 @@ import (
 
 // IndexAction returns cluster health information
 func (handler *API) IndexAction(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+
 	log.Debug("index action")
 
 	upstream := handler.GetHeader(req, "UPSTREAM", "auto")
@@ -28,7 +29,7 @@ func (handler *API) IndexAction(w http.ResponseWriter, req *http.Request, _ http
 
 		cfg := config.GetUpstreamConfig(upstream)
 		if cfg.Enabled && cfg.Writeable {
-
+			//client:=elastic.GetClient(cfg.Name)
 			response, err := handler.executeHttpRequest(elastic.GetConfig(cfg.Elasticsearch), req.URL.String(), req.Method, nil)
 			if err != nil {
 				log.Error(err)
@@ -90,6 +91,8 @@ func (handler *API) executeHttpRequest(cfg elastic.ElasticsearchConfig, url, met
 	if cfg.BasicAuth != nil {
 		request.SetBasicAuth(cfg.BasicAuth.Username, cfg.BasicAuth.Password)
 	}
+	request.ContentType="application/json"
+
 	return util.ExecuteRequest(request)
 }
 
