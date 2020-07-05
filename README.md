@@ -13,6 +13,7 @@ PROXY, a lightweight elasticsearch proxy written in golang.
 - Index throttling or buffering, via disk based indexing queue(limit by queue length or size)
 - Search throttling, limit concurrent connections to upstream(WIP)
 - Builtin stats API and management UI(WIP)
+- Builtin floating IP, support seamless failover and rolling upgrade
 
 # How to use
 
@@ -149,6 +150,20 @@ Have fun!
     * Connection #0 to host localhost left intact
     {"_index":"index","_type":"doc","_id":"1","_version":5,"found":true,"_source":{"a":6}}%
     ```
+
+# Floating IP
+In order to use floating IP, configure `floating_ip` under plugin section, set `ip` to a unoccupied ip which will be used to share across proxies, set `interface` to which network device will be used to bind floating ip.
+
+```
+plugins:
+- name: floating_ip
+  enabled: true
+  ip: 192.168.1.222
+  netmask: 255.255.255.0
+  interface: en0
+  priority: 100
+```
+Note: Floating IP feature may not support on docker/container platform.
 
 # API
 
