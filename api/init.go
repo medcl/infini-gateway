@@ -20,15 +20,16 @@ type CacheHandler struct {
 	config *CacheConfig
 	client *redis.Client
 }
+var client *redis.Client
 
 func (handler CacheHandler) Init() {
 
-	client := redis.NewClient(&redis.Options{
+	client = redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", handler.config.RedisConfig.Host, handler.config.RedisConfig.Port),
 		Password: handler.config.RedisConfig.Password,
 		DB:       handler.config.RedisConfig.DB,
 	})
-
+	handler.client=client
 	_, err := client.Ping().Result()
 	if err != nil {
 		log.Error("cache server is not ready: ", err)
@@ -37,11 +38,13 @@ func (handler CacheHandler) Init() {
 }
 
 func (handler CacheHandler) Get(key string) ([]byte, error) {
-	return nil, nil
+	data,err:= client.Get(key).Bytes()
+	return data,err
 }
 
-func (handler CacheHandler) Set(string, []byte, int64) (bool, error) {
-	return false, nil
+func (handler CacheHandler) Set(key string,data []byte,ttl int64) (bool, error) {
+	err:=client.Set(key,data, time.Duration(ttl)*time.Millisecond).Err()
+	return err==nil,err
 }
 
 type RedisConfig struct {

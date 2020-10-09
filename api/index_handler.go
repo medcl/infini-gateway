@@ -105,9 +105,7 @@ func (handler *API) handleRead(w http.ResponseWriter, req *http.Request, body []
 	var hash string
 
 	if handler.cacheConfig.CacheEnabled {
-
 		hash = getHash(handler.cacheConfig.KeyPrefix, req, body)
-
 		cache, err := handler.cacheHandler.Get(hash)
 		if len(cache) > 0 && err == nil {
 			if global.Env().IsDebug {

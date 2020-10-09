@@ -7,7 +7,7 @@ api:
   network:
     binding: 0.0.0.0:2900
   tls:
-    enabled: true
+    enabled: false
 
 elasticsearch:
 - name: default
@@ -32,8 +32,7 @@ cache:
 plugins:
 - name: proxy
   enabled: true
-  ui_enabled: false
-  pass_through: ["_update","_search", "_count", "_analyze", "_mget", "_doc", "_mtermvectors", "_msearch", "_search_shards", "_suggest", "_validate", "_explain", "_field_caps", "_rank_eval", "_aliases"]
+  pass_through: []
   upstream:
   - name: primary
     enabled: true
@@ -45,16 +44,9 @@ plugins:
     max_queue_depth: -1
     timeout: 60s
     elasticsearch: default
-  - name: backup
-    enabled: false
-    cache_enabled: false
-    queue_name: backup
-    max_queue_depth: -1
-    timeout: 60s
-    elasticsearch: default
 
 - name: floating_ip
-  enabled: true
+  enabled: false
   ip: 192.168.1.222
   netmask: 255.255.255.0
   interface: en0
@@ -62,14 +54,6 @@ plugins:
 
 pipelines:
 - name: primary
-  start:
-    joint: index
-    enabled: true
-  process: []
-  error:
-    joint: logging
-    enabled: true
-- name: backup
   start:
     joint: index
     enabled: true
@@ -87,13 +71,6 @@ modules:
   store_enabled: true
   orm_enabled: true
 
-- name: web
-  enabled: false
-  tls:
-     enabled: true
-  network:
-     binding: 127.0.0.1:9000
-
 - name: pipeline
   enabled: true
   runners:
@@ -104,11 +81,3 @@ modules:
       threshold_in_ms: 0
       timeout_in_ms: 5000
       pipeline_id: primary
-
-    - name: backup
-      enabled: true
-      input_queue: backup
-      max_go_routine: 1
-      threshold_in_ms: 0
-      timeout_in_ms: 5000
-      pipeline_id: backup
