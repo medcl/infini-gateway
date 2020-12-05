@@ -2,5 +2,9 @@ INFINI-GATEWAY, a high performance and lightweight gateway written in golang, fo
 
 # Download
 [https://github.com/medcl/infini-gateway/releases](https://github.com/medcl/infini-gateway/releases)
-It is under heavy developemnt, API/configuration are not suggested to be stalbe.
+
+Note: It is currently under heavy developemnt, API or configuration are not suggested to be stable.
+
 Please download the latest version, your testing and feedback are appreciated.
+
+Have fun!
