@@ -5,7 +5,7 @@ INFINI-GATEWAY, a high performance and lightweight gateway written in golang, fo
 
 Download the [latest SNAPSHOT version](http://release.elasticsearch.cn/), your testing and feedback are appreciated.
 
-Note: It is currently under heavy developemnt, API or configuration are not suggested to be stable.
+Note: It is currently under heavy developemnt, API or configurations are not supposed to be stable.
 
 # Documentation
 
